@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Life OS">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23080910'/><text y='.9em' font-size='80' x='10'>⚡</text></svg>">
+<title>Life OS — Virgil</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;0,700;1,300;1,700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #07080f;
+  --s1: #0d0f18;
+  --s2: #13151f;
+  --s3: #1a1c28;
+  --s4: #222436;
+  --line: #1e2132;
+  --line2: #272a3d;
+  --ghost: #363a52;
+  --text: #e2e5f5;
+  --dim: #555a78;
+  --gold: #c8a84a;
+  --gold2: #f0cc76;
+  --gold-g: rgba(200,168,74,0.1);
+  --sage: #6fcf97;
+  --sage-g: rgba(111,207,151,0.1);
+  --rose: #e07b6a;
+  --rose-g: rgba(224,123,106,0.1);
+  --ice: #7eb8d4;
+  --ice-g: rgba(126,184,212,0.1);
+  --amber: #e8a840;
+  --amber-g: rgba(232,168,64,0.08);
+  --safe: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; }
+
+/* STATUS BAR */
+.statusbar { height: 44px; background: rgba(7,8,15,0.95); display: flex; align-items: flex-end; padding: 0 20px 8px; font-size: 10px; color: var(--dim); letter-spacing: 1px; flex-shrink: 0; border-bottom: 1px solid var(--line); justify-content: space-between; }
+.sb-left { display: flex; align-items: center; gap: 8px; }
+.sb-pulse { width: 5px; height: 5px; background: var(--sage); border-radius: 50%; box-shadow: 0 0 6px rgba(111,207,151,0.6); animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.3)} }
+
+/* LAYOUT */
+.app { display: flex; flex-direction: column; height: 100%; }
+.content { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+.content::-webkit-scrollbar { display: none; }
+
+/* BOTTOM NAV */
+.nav { height: calc(60px + var(--safe)); min-height: 60px; background: rgba(7,8,15,0.97); backdrop-filter: blur(20px); border-top: 1px solid var(--line); display: flex; align-items: flex-start; padding-top: 8px; flex-shrink: 0; position: relative; z-index: 100; }
+.nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; padding: 4px 0; transition: all .15s; }
+.nav-icon { font-size: 18px; line-height: 1; transition: transform .15s; }
+.nav-label { font-size: 8.5px; color: var(--dim); letter-spacing: .8px; transition: color .15s; }
+.nav-item.active .nav-label { color: var(--gold); }
+.nav-item.active .nav-icon { transform: scale(1.1); }
+.nav-dot { width: 3px; height: 3px; background: var(--gold); border-radius: 50%; margin-top: -1px; }
+
+/* VIEWS */
+.view { display: none; padding: 20px 16px 24px; animation: fadeUp .2s ease; }
+.view.active { display: block; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+/* HEADERS */
+.vh { margin-bottom: 20px; }
+.vh-tag { font-size: 8px; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; margin-bottom: 5px; }
+.vh-title { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 300; letter-spacing: -1px; line-height: 1.1; }
+.vh-title em { font-style: italic; color: var(--gold); }
+.vh-sub { font-size: 10px; color: var(--dim); margin-top: 4px; line-height: 1.7; }
+
+/* CARDS */
+.card { background: var(--s2); border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+.card.gold { border-color: rgba(200,168,74,0.25); background: linear-gradient(145deg, var(--s2), rgba(200,168,74,0.04)); }
+.card.sage { border-color: rgba(111,207,151,0.2); }
+.card.rose { border-color: rgba(224,123,106,0.2); }
+.card.ice { border-color: rgba(126,184,212,0.2); }
+.card.inset { background: var(--s3); border-color: var(--line2); }
+.ct { font-size: 11px; font-weight: 500; color: var(--text); margin-bottom: 12px; letter-spacing: .2px; }
+.ce { font-size: 8px; letter-spacing: 2.5px; color: var(--dim); text-transform: uppercase; margin-bottom: 6px; }
+
+/* HERO */
+.hero { background: var(--s2); border: 1px solid var(--line); border-radius: 16px; padding: 20px; margin-bottom: 14px; position: relative; overflow: hidden; }
+.hero::after { content: ''; position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: radial-gradient(circle, rgba(200,168,74,.07) 0%, transparent 70%); pointer-events: none; }
+.hero-date { font-size: 9px; letter-spacing: 2px; color: var(--dim); margin-bottom: 8px; }
+.hero-name { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 300; letter-spacing: -.8px; margin-bottom: 4px; }
+.hero-name em { font-style: italic; color: var(--gold); }
+.hero-sub { font-size: 10px; color: var(--dim); }
+
+/* ENERGY */
+.en-row { display: grid; grid-template-columns: repeat(5,1fr); gap: 6px; margin: 10px 0; }
+.en-opt { background: var(--s3); border: 1px solid var(--line2); border-radius: 10px; padding: 10px 4px; text-align: center; cursor: pointer; transition: all .15s; }
+.en-opt.sel { border-color: var(--gold); background: var(--gold-g); }
+.en-opt .ei { font-size: 18px; margin-bottom: 3px; }
+.en-opt .el { font-size: 7.5px; color: var(--dim); letter-spacing: .3px; }
+.en-opt.sel .el { color: var(--gold); }
+
+/* CAP BAR */
+.cap-bar { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+.cap-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+.cap-lbl { font-size: 8px; letter-spacing: 2px; color: var(--dim); }
+.cap-val { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 300; color: var(--gold); }
+.cap-track { height: 3px; background: var(--line2); border-radius: 3px; overflow: hidden; }
+.cap-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--sage), var(--gold), var(--rose)); transition: width .8s cubic-bezier(.4,0,.2,1); }
+
+/* AI BLOCK */
+.ai-block { border-radius: 12px; padding: 14px; margin-bottom: 10px; border-left: 3px solid; }
+.ai-block.advice { background: rgba(126,184,212,.07); border-color: var(--ice); }
+.ai-block.go { background: var(--sage-g); border-color: var(--sage); }
+.ai-block.warn { background: var(--rose-g); border-color: var(--rose); }
+.ai-block.wait { background: var(--amber-g); border-color: var(--amber); }
+.ai-title { font-size: 10px; font-weight: 500; margin-bottom: 5px; }
+.ai-body { font-size: 10.5px; color: var(--dim); line-height: 1.75; }
+.ai-body strong { color: var(--text); font-weight: 500; }
+
+/* CHECKLIST */
+.ck { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid rgba(30,33,50,.8); cursor: pointer; transition: opacity .15s; }
+.ck:last-child { border-bottom: none; }
+.ck.done { opacity: .28; }
+.ck-box { width: 16px; height: 16px; border: 1.5px solid var(--ghost); border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .15s; }
+.ck.done .ck-box { background: var(--sage); border-color: var(--sage); }
+.ck.done .ck-box::after { content: '✓'; font-size: 9px; color: #07080f; font-weight: 700; }
+.ck.done .ck-lbl { text-decoration: line-through; }
+.ck-lbl { font-size: 11.5px; flex: 1; line-height: 1.3; }
+.ck-time { font-size: 8.5px; color: var(--dim); flex-shrink: 0; }
+
+/* WORKOUT CARDS */
+.wo { background: var(--s3); border: 1px solid var(--line2); border-radius: 12px; padding: 13px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; transition: all .15s; }
+.wo.chosen { border-color: var(--gold); background: var(--gold-g); }
+.wo.disabled { opacity: .22; }
+.wo-ico { width: 38px; height: 38px; border-radius: 10px; background: var(--s4); display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+.wo-body { flex: 1; min-width: 0; }
+.wo-name { font-size: 12px; font-weight: 500; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wo-meta { font-size: 9.5px; color: var(--dim); }
+.wo-load { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; flex-shrink: 0; }
+.wl-bar { width: 44px; height: 2px; background: var(--line2); border-radius: 2px; overflow: hidden; }
+.wl-fill { height: 100%; border-radius: 2px; }
+.wl-val { font-size: 8px; color: var(--dim); }
+.wo-check { width: 20px; height: 20px; border: 1.5px solid var(--ghost); border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; transition: all .15s; }
+.wo-check.done { background: var(--sage); border-color: var(--sage); }
+.wo-check.done::after { content: '✓'; font-size: 10px; color: #07080f; font-weight: 700; }
+
+/* METRICS */
+.metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.metric { background: var(--s2); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+.m-label { font-size: 8px; letter-spacing: 2px; color: var(--dim); text-transform: uppercase; margin-bottom: 8px; }
+.m-val { font-family: 'Fraunces', serif; font-size: 34px; font-weight: 300; line-height: 1; letter-spacing: -1.5px; }
+.m-unit { font-size: 12px; color: var(--dim); margin-left: 2px; font-family: 'DM Mono', monospace; }
+.m-sub { font-size: 9px; color: var(--dim); margin-top: 5px; }
+.pb { margin-top: 8px; }
+.pb-row { display: flex; justify-content: space-between; font-size: 9px; color: var(--dim); margin-bottom: 3px; }
+.pbt { height: 2px; background: var(--line2); border-radius: 2px; overflow: hidden; }
+.pbf { height: 100%; border-radius: 2px; transition: width 1s ease; }
+.pbf.gold { background: linear-gradient(90deg, var(--gold), var(--gold2)); }
+.pbf.sage { background: linear-gradient(90deg, var(--sage), #9de8bb); }
+
+/* INPUTS */
+input, textarea, select { background: var(--s3); border: 1px solid var(--line2); border-radius: 10px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; padding: 11px 13px; width: 100%; outline: none; transition: border-color .15s; -webkit-appearance: none; }
+input:focus, textarea:focus { border-color: rgba(200,168,74,.4); }
+textarea { resize: none; line-height: 1.6; }
+label { display: block; font-size: 8px; letter-spacing: 2px; color: var(--dim); text-transform: uppercase; margin-bottom: 5px; }
+.fg { margin-bottom: 11px; }
+
+/* BUTTONS */
+.btn { padding: 12px 18px; border-radius: 12px; font-size: 11.5px; font-family: 'DM Mono', monospace; font-weight: 500; cursor: pointer; border: none; transition: all .12s; letter-spacing: .3px; width: 100%; }
+.btn-gold { background: var(--gold); color: #07080f; font-weight: 600; }
+.btn-gold:active { background: var(--gold2); transform: scale(.98); }
+.btn-ghost { background: transparent; border: 1px solid var(--line2); color: var(--dim); }
+.btn-ghost:active { border-color: var(--ghost); color: var(--text); }
+.btn-row { display: flex; gap: 8px; }
+.btn-row .btn { flex: 1; }
+
+/* TAGS */
+.tag { display: inline-flex; align-items: center; font-size: 9px; padding: 3px 9px; border-radius: 20px; font-weight: 500; letter-spacing: .3px; }
+.tag-gold { background: var(--gold-g); color: var(--gold); border: 1px solid rgba(200,168,74,.2); }
+.tag-sage { background: var(--sage-g); color: var(--sage); border: 1px solid rgba(111,207,151,.2); }
+.tag-rose { background: var(--rose-g); color: var(--rose); border: 1px solid rgba(224,123,106,.2); }
+.tag-ice { background: var(--ice-g); color: var(--ice); border: 1px solid rgba(126,184,212,.2); }
+.tag-dim { background: var(--s3); color: var(--dim); border: 1px solid var(--line2); }
+
+/* LOADING */
+.loading { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 32px 0; font-size: 10px; color: var(--dim); }
+.spin { width: 14px; height: 14px; border: 2px solid var(--line2); border-top-color: var(--gold); border-radius: 50%; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* TOAST */
+.toast { position: fixed; bottom: calc(80px + var(--safe)); left: 50%; transform: translateX(-50%) translateY(20px); background: var(--s4); border: 1px solid var(--line2); border-radius: 20px; padding: 8px 16px; font-size: 11px; color: var(--text); z-index: 1000; opacity: 0; transition: all .25s; white-space: nowrap; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* STAT ROW */
+.sr { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid rgba(30,33,50,.8); font-size: 11px; }
+.sr:last-child { border-bottom: none; }
+.sr-l { color: var(--dim); }
+.sr-r { font-weight: 500; }
+
+/* REFLECTION */
+.ref-entry { background: var(--s3); border: 1px solid var(--line2); border-radius: 12px; padding: 13px; margin-bottom: 8px; }
+.ref-date { font-size: 8px; color: var(--dim); letter-spacing: 1.5px; margin-bottom: 7px; }
+.ref-line { font-size: 11px; margin-bottom: 4px; line-height: 1.6; color: var(--dim); }
+.ref-line span { font-weight: 500; }
+
+/* NOTION SYNC */
+.sync-row { display: flex; align-items: center; gap: 6px; font-size: 9px; color: var(--dim); margin-bottom: 8px; }
+.sync-dot { width: 5px; height: 5px; border-radius: 50%; }
+.sync-dot.ok { background: var(--sage); }
+.sync-dot.loading { background: var(--amber); animation: pulse .8s ease-in-out infinite; }
+.sync-dot.err { background: var(--rose); }
+
+/* DIVIDER */
+.div { height: 1px; background: var(--line); margin: 14px 0; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="statusbar">
+    <div class="sb-left">
+      <div class="sb-pulse"></div>
+      <span id="clockEl">00:00</span>
+    </div>
+    <span id="syncStatus">NOTION SYNC</span>
+  </div>
+
+  <div class="content" id="mainContent">
+
+    <!-- VANDAAG -->
+    <div class="view active" id="view-vandaag">
+      <div class="hero">
+        <div class="hero-date" id="heroDate">MAANDAG 9 MAART 2026</div>
+        <div class="hero-name">Goedemorgen, <em>Virgil.</em></div>
+        <div class="hero-sub" id="heroSub">Dag voor dag. Consistentie wint.</div>
+        <div class="cap-bar">
+          <div class="cap-row">
+            <span class="cap-lbl">DAGCAPACITEIT</span>
+            <span class="cap-val" id="capVal">—</span>
+          </div>
+          <div class="cap-track"><div class="cap-fill" id="capFill" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <!-- ENERGIE -->
+      <div class="card">
+        <div class="ce">Energie vandaag</div>
+        <div class="en-row" id="energyRow">
+          <div class="en-opt" onclick="setEnergy(this,20,'🔴','UITGEPUT')"><div class="ei">🔴</div><div class="el">UITGEPUT</div></div>
+          <div class="en-opt" onclick="setEnergy(this,40,'🟠','LAAG')"><div class="ei">🟠</div><div class="el">LAAG</div></div>
+          <div class="en-opt" onclick="setEnergy(this,60,'🟡','NORMAAL')"><div class="ei">🟡</div><div class="el">NORMAAL</div></div>
+          <div class="en-opt" onclick="setEnergy(this,80,'🟢','GOED')"><div class="ei">🟢</div><div class="el">GOED</div></div>
+          <div class="en-opt" onclick="setEnergy(this,100,'⚡','ON FIRE')"><div class="ei">⚡</div><div class="el">ON FIRE</div></div>
+        </div>
+      </div>
+
+      <!-- AI ADVIES -->
+      <div id="aiAdvies"></div>
+
+      <!-- OCHTEND CHECKLIST -->
+      <div class="card">
+        <div class="ct">🌅 Ochtend</div>
+        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Stilte & Gebed</span><span class="ck-time">06:00</span></div>
+        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Bijbel lezen</span><span class="ck-time">06:15</span></div>
+        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Fundamentals training</span><span class="ck-time">06:45</span></div>
+        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Dagplanning maken</span><span class="ck-time">07:30</span></div>
+        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Gezond ontbijt</span><span class="ck-time">07:45</span></div>
+      </div>
+
+      <div class="card">
+        <div class="ct">☀️ Overdag</div>
+        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">10.000 stappen</span><span class="ck-time">Actief</span></div>
+        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Training uitvoeren</span><span class="ck-time">Gym</span></div>
+        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Focus werk (4u)</span><span class="ck-time">Deep</span></div>
+        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Budget bijhouden</span><span class="ck-time">€80</span></div>
+        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Tijd Neyla & Diego</span><span class="ck-time">Vader</span></div>
+      </div>
+
+      <div class="card">
+        <div class="ct">🌙 Avond</div>
+        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Dagreflectie</span><span class="ck-time">20:00</span></div>
+        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Planning morgen</span><span class="ck-time">20:30</span></div>
+        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Geen scherm na 21:30</span><span class="ck-time">21:30</span></div>
+        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Gebed</span><span class="ck-time">22:00</span></div>
+        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Slaap voor 22:30</span><span class="ck-time">22:30</span></div>
+      </div>
+    </div>
+
+    <!-- TRAINING -->
+    <div class="view" id="view-training">
+      <div class="vh">
+        <div class="vh-tag">Laag 3 — Systeem</div>
+        <div class="vh-title">Training <em>Engine</em></div>
+        <div class="vh-sub" id="trainingSub">Selecteert automatisch op basis van je energie en capaciteit uit Notion.</div>
+      </div>
+
+      <div id="trainingLoading" class="loading"><div class="spin"></div>Notion laden...</div>
+      <div id="trainingContent" style="display:none">
+        <div id="gekozenBlock"></div>
+        <div class="div"></div>
+        <div class="ce" style="margin-bottom:10px">Alle workouts</div>
+        <div id="woList"></div>
+      </div>
+    </div>
+
+    <!-- METRICS -->
+    <div class="view" id="view-metrics">
+      <div class="vh">
+        <div class="vh-tag">Laag 4 — Executie</div>
+        <div class="vh-title">Jouw <em>Metrics</em></div>
+      </div>
+
+      <div class="metrics">
+        <div class="metric gold" style="border-color:rgba(200,168,74,.25)">
+          <div class="m-label">Gewicht</div>
+          <div><span class="m-val" id="mW" style="color:var(--gold)">95</span><span class="m-unit">kg</span></div>
+          <div class="pb"><div class="pb-row"><span>96 start</span><span id="mWpct">5%</span></div><div class="pbt"><div class="pbf gold" id="mWbar" style="width:5%"></div></div></div>
+          <div class="m-sub">Doel: 77 kg — nog <strong id="mWleft" style="color:var(--gold)">18 kg</strong></div>
+        </div>
+        <div class="metric" style="border-color:rgba(126,184,212,.2)">
+          <div class="m-label">Stappen</div>
+          <div><span class="m-val" id="mS" style="color:var(--ice)">0</span></div>
+          <div class="pb"><div class="pb-row"><span>doel</span><span id="mSpct">0%</span></div><div class="pbt"><div class="pbf" id="mSbar" style="width:0%;background:var(--ice)"></div></div></div>
+          <div class="m-sub">van 10.000</div>
+        </div>
+        <div class="metric" style="border-color:rgba(111,207,151,.2)">
+          <div class="m-label">Budget</div>
+          <div><span class="m-val" id="mB" style="color:var(--sage)">80</span><span class="m-unit">€</span></div>
+          <div class="pb"><div class="pb-row"><span>resterend</span><span id="mBpct">100%</span></div><div class="pbt"><div class="pbf sage" id="mBbar" style="width:100%"></div></div></div>
+          <div class="m-sub">van €80 week</div>
+        </div>
+        <div class="metric">
+          <div class="m-label">BMI</div>
+          <div><span class="m-val" id="mBMI" style="color:var(--rose)">32.1</span></div>
+          <div class="m-sub" style="margin-top:12px">Doel: &lt;25</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="ct">Gewicht invoeren</div>
+        <div class="fg"><label>Huidig gewicht (kg)</label><input type="number" id="wInput" step="0.1" min="70" max="110" placeholder="95.0" oninput="updateW(this.value)"></div>
+        <div class="fg"><label>Stappen vandaag</label><input type="number" id="sInput" min="0" max="50000" placeholder="0" oninput="updateS(this.value)"></div>
+        <div class="fg"><label>Uitgaven (€)</label><input type="number" id="bInput" step="0.5" min="0" placeholder="0.00"></div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="spendB()">Aftrekken van budget</button>
+          <button class="btn btn-gold" onclick="saveMetrics()">Opslaan</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- REFLECTIE -->
+    <div class="view" id="view-reflectie">
+      <div class="vh">
+        <div class="vh-tag">Laag 4 — Executie</div>
+        <div class="vh-title">Dagelijkse <em>Reflectie</em></div>
+      </div>
+
+      <div class="card">
+        <div class="fg"><label>Wat ging goed vandaag?</label><textarea id="rG" rows="2" placeholder="Eerlijk schrijven..."></textarea></div>
+        <div class="fg"><label>Wat kon beter?</label><textarea id="rB" rows="2" placeholder="Wees open..."></textarea></div>
+        <div class="fg"><label>Wat leer ik hiervan?</label><textarea id="rL" rows="2" placeholder="Inzicht voor morgen..."></textarea></div>
+        <div class="fg"><label>Ik ben dankbaar voor</label><input type="text" id="rGr" placeholder="Vandaag dankbaar voor..."></div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="clearRef()">Wissen</button>
+          <button class="btn btn-gold" onclick="saveRef()">Opslaan</button>
+        </div>
+      </div>
+
+      <div class="ce" style="margin:14px 0 8px">Eerdere reflecties</div>
+      <div id="refLog"><div style="font-size:11px;color:var(--dim);text-align:center;padding:24px 0">Begin vandaag met reflecteren.</div></div>
+    </div>
+
+    <!-- PROFIEL -->
+    <div class="view" id="view-profiel">
+      <div class="vh">
+        <div class="vh-tag">Identiteit</div>
+        <div class="vh-title"><em>Virgil</em> Rigters</div>
+      </div>
+
+      <div class="card gold">
+        <div class="sr"><span class="sr-l">Leeftijd</span><span class="sr-r">31 jaar</span></div>
+        <div class="sr"><span class="sr-l">Locatie</span><span class="sr-r">Nederland</span></div>
+        <div class="sr"><span class="sr-l">Kinderen</span><span class="sr-r">Neyla (7) & Diego (5)</span></div>
+        <div class="sr"><span class="sr-l">Fase</span><span class="sr-r tag tag-gold">Fundament</span></div>
+        <div class="sr"><span class="sr-l">Gewichtsdoel</span><span class="sr-r">96 → 77 kg</span></div>
+        <div class="sr"><span class="sr-l">Financieel</span><span class="sr-r">Schuldsanering</span></div>
+        <div class="sr"><span class="sr-l">Bedrijf</span><span class="sr-r">~2027</span></div>
+      </div>
+
+      <div class="card">
+        <div class="ct">Notion verbinding</div>
+        <div id="notionStatus" class="loading"><div class="spin"></div>Verbinding testen...</div>
+      </div>
+
+      <div class="card">
+        <div class="ct">Ik ben een man die...</div>
+        <div style="font-size:11px;color:var(--dim);line-height:2.1">
+          → discipline heeft elke dag<br>
+          → fysiek opbouwt van 96 naar 77 kg<br>
+          → leeft vanuit geloof en gebed<br>
+          → financieel groeit naar €100k<br>
+          → leider is voor zijn gezin<br>
+          → vader is voor Neyla en Diego<br>
+          → ondernemer wordt vanaf ~2027
+        </div>
+      </div>
+
+      <div class="card inset">
+        <div style="font-family:'Fraunces',serif;font-size:20px;font-weight:300;line-height:1.4;text-align:center;padding:8px 0">
+          "Niet perfectie.<br><em style="color:var(--gold)">Consistentie."</em>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="nav">
+    <div class="nav-item active" onclick="goTo('vandaag',this)">
+      <div class="nav-icon">⚡</div>
+      <div class="nav-label">VANDAAG</div>
+      <div class="nav-dot"></div>
+    </div>
+    <div class="nav-item" onclick="goTo('training',this)">
+      <div class="nav-icon">💪</div>
+      <div class="nav-label">TRAINING</div>
+    </div>
+    <div class="nav-item" onclick="goTo('metrics',this)">
+      <div class="nav-icon">◈</div>
+      <div class="nav-label">METRICS</div>
+    </div>
+    <div class="nav-item" onclick="goTo('reflectie',this)">
+      <div class="nav-icon">🪞</div>
+      <div class="nav-label">REFLECTIE</div>
+    </div>
+    <div class="nav-item" onclick="goTo('profiel',this)">
+      <div class="nav-icon">◎</div>
+      <div class="nav-label">PROFIEL</div>
+    </div>
+  </nav>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══ STATE ═══════════════════════════════
+const S = {
+  energy: null, cap: 0,
+  weight: parseFloat(localStorage.getItem('w') || '95'),
+  steps: parseInt(localStorage.getItem('s') || '0'),
+  budget: parseFloat(localStorage.getItem('b') || '80'),
+  refs: JSON.parse(localStorage.getItem('refs') || '[]'),
+  dagId: null,
+  workouts: [],
+  syncOk: false
+};
+
+// ═══ API ══════════════════════════════════
+const API = '/api';
+
+async function apiGet(path) {
+  try {
+    const r = await fetch(API + path);
+    if (!r.ok) throw new Error(r.status);
+    return await r.json();
+  } catch(e) { console.error('API GET error:', e); return null; }
+}
+
+async function apiPost(path, body) {
+  try {
+    const r = await fetch(API + path, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(body)
+    });
+    return await r.json();
+  } catch(e) { console.error('API POST error:', e); return null; }
+}
+
+async function apiPatch(path, body) {
+  try {
+    const r = await fetch(API + path, {
+      method: 'PATCH',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(body)
+    });
+    return await r.json();
+  } catch(e) { console.error('API PATCH error:', e); return null; }
+}
+
+// ═══ INIT ═════════════════════════════════
+async function init() {
+  updateClock();
+  setInterval(updateClock, 1000);
+  setHeroDate();
+  loadMetricsDisplay();
+  loadRefs();
+  await loadDag();
+  await loadWorkouts();
+}
+
+// ═══ DAG LADEN ════════════════════════════
+async function loadDag() {
+  setSyncStatus('loading', 'SYNCING...');
+  const data = await apiGet('/dagen');
+
+  if (data && data.results && data.results.length > 0) {
+    const dag = data.results[0];
+    S.dagId = dag.id;
+    S.syncOk = true;
+    setSyncStatus('ok', 'NOTION ✓');
+
+    // Lees energie uit Notion als die er is
+    const intensiteit = dag.properties?.['Intensiteit toegestaan']?.select?.name;
+    if (intensiteit) {
+      const map = {'Rust':20,'Licht':40,'Normaal':60,'Zwaar':80,'Maximaal':100};
+      const cap = map[intensiteit] || 60;
+      // Toon maar forceer niet — gebruiker kiest zelf
+    }
+
+    const herstel = dag.properties?.['Herstelstatus']?.formula?.string;
+    if (herstel) {
+      document.getElementById('heroSub').textContent = herstel + ' · Notion gesynchroniseerd';
+    }
+  } else if (data && data.results && data.results.length === 0) {
+    // Vandaag nog geen entry — aanmaken
+    const nieuw = await apiPost('/dagen', { dag_type: 'Werkdag licht', intensiteit: 'Normaal' });
+    if (nieuw && nieuw.id) {
+      S.dagId = nieuw.id;
+      S.syncOk = true;
+      setSyncStatus('ok', 'NOTION ✓ NIEUW');
+    }
+  } else {
+    setSyncStatus('err', 'OFFLINE');
+    document.getElementById('heroSub').textContent = 'Offline modus — data lokaal opgeslagen';
+  }
+
+  updateNotionStatusCard();
+}
+
+// ═══ WORKOUTS LADEN ═══════════════════════
+async function loadWorkouts() {
+  const data = await apiGet('/workouts');
+  if (!data || !data.results) {
+    document.getElementById('trainingLoading').innerHTML = '<div style="font-size:11px;color:var(--dim);text-align:center;padding:24px 0">Kon workouts niet laden. Controleer Notion verbinding.</div>';
+    return;
+  }
+
+  S.workouts = data.results.map(p => {
+    const props = p.properties;
+    return {
+      id: p.id,
+      naam: props['Naam']?.title?.[0]?.plain_text || 'Naamloos',
+      type: props['Type']?.select?.name || '—',
+      focus: props['Focus']?.multi_select?.map(f => f.name).join(', ') || '—',
+      belasting: props['Benodigde capaciteit']?.number || 0,
+      duur: props['Duur (min)']?.number || 0,
+      gedaan: props['Gedaan']?.checkbox || false,
+      magVandaag: props['Mag vandaag']?.formula?.boolean || false,
+      kandidaat: props['Kandidaat vandaag']?.formula?.boolean || false,
+    };
+  });
+
+  renderWorkouts();
+}
+
+// ═══ RENDER WORKOUTS ══════════════════════
+function renderWorkouts() {
+  document.getElementById('trainingLoading').style.display = 'none';
+  document.getElementById('trainingContent').style.display = 'block';
+
+  const icons = {'Fundament':'🧘','Kracht':'💪','Mobiliteit':'🌊','Cardio':'🚶','Core':'⬡'};
+  const colors = {'Fundament':'var(--ice)','Kracht':'var(--gold)','Mobiliteit':'var(--sage)','Cardio':'var(--sage)','Core':'var(--violet, #9b8aff)'};
+
+  // Gekozen workout
+  const kandidaten = S.workouts.filter(w => w.kandidaat && !w.gedaan);
+  const gekozen = kandidaten.sort((a,b) => b.belasting - a.belasting)[0];
+
+  const gb = document.getElementById('gekozenBlock');
+  if (gekozen) {
+    gb.innerHTML = `
+      <div class="card gold">
+        <div class="ce">Aanbevolen training vandaag</div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+          <div style="width:44px;height:44px;border-radius:12px;background:var(--s4);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${icons[gekozen.type]||'💪'}</div>
+          <div>
+            <div style="font-size:13px;font-weight:500;margin-bottom:2px">${gekozen.naam}</div>
+            <div style="font-size:10px;color:var(--dim)">${gekozen.focus} · ${gekozen.duur || '—'} min</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <span class="tag tag-gold">Belasting: ${gekozen.belasting}/10</span>
+          <span class="tag tag-sage">Aanbevolen</span>
+        </div>
+        <button class="btn btn-gold" style="margin-top:12px" onclick="markGedaan('${gekozen.id}')">✓ Training voltooid</button>
+      </div>
+    `;
+  } else if (S.cap > 0) {
+    gb.innerHTML = `<div class="ai-block warn"><div class="ai-title" style="color:var(--rose)">Geen training vandaag</div><div class="ai-body">Capaciteit te laag voor beschikbare workouts. <strong>Rust dag.</strong></div></div>`;
+  } else {
+    gb.innerHTML = `<div class="ai-block advice"><div class="ai-title" style="color:var(--ice)">Stel energie in</div><div class="ai-body">Ga naar Vandaag → kies je energie → kom terug voor je training.</div></div>`;
+  }
+
+  // Alle workouts
+  const woList = document.getElementById('woList');
+  woList.innerHTML = S.workouts.map(w => {
+    const pct = (w.belasting / 10) * 100;
+    const c = colors[w.type] || 'var(--gold)';
+    const isKandidaat = w.kandidaat;
+    const cls = w.gedaan ? 'disabled' : isKandidaat ? '' : '';
+    return `
+      <div class="wo ${w.gedaan?'disabled':''}" style="${isKandidaat?'border-color:rgba(200,168,74,.2)':''}">
+        <div class="wo-ico">${icons[w.type]||'💪'}</div>
+        <div class="wo-body">
+          <div class="wo-name">${w.naam}</div>
+          <div class="wo-meta">${w.focus} · ${w.duur||'—'} min · ${w.type}</div>
+        </div>
+        <div class="wo-load">
+          <div class="wl-bar"><div class="wl-fill" style="width:${pct}%;background:${c}"></div></div>
+          <div class="wl-val">load ${w.belasting}/10</div>
+        </div>
+        <div class="wo-check ${w.gedaan?'done':''}" onclick="markGedaan('${w.id}')"></div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ═══ MARK GEDAAN ══════════════════════════
+async function markGedaan(id) {
+  showToast('Opslaan in Notion...');
+  const result = await apiPatch(`/workouts/${id}`, {
+    properties: { 'Gedaan': { checkbox: true } }
+  });
+  if (result && result.id) {
+    const wo = S.workouts.find(w => w.id === id);
+    if (wo) wo.gedaan = true;
+    renderWorkouts();
+    showToast('✓ Opgeslagen in Notion');
+  } else {
+    showToast('⚠️ Kon niet opslaan');
+  }
+}
+
+// ═══ ENERGIE ══════════════════════════════
+async function setEnergy(el, cap, icon, lbl) {
+  document.querySelectorAll('.en-opt').forEach(e => e.classList.remove('sel'));
+  el.classList.add('sel');
+  S.energy = lbl; S.cap = cap;
+
+  document.getElementById('capVal').textContent = cap + '%';
+  document.getElementById('capFill').style.width = cap + '%';
+
+  // Update Notion dag
+  if (S.dagId) {
+    const intMap = {20:'Rust',40:'Licht',60:'Normaal',80:'Zwaar',100:'Maximaal'};
+    await apiPatch(`/dagen/${S.dagId}`, {
+      properties: { 'Intensiteit toegestaan': { select: { name: intMap[cap] || 'Normaal' } } }
+    });
+  }
+
+  // AI advies
+  const advice = {
+    20: {t:'warn', title:'🔴 Hersteldag', body:'Energie kritiek. <strong>Geen training.</strong> Gebed en stilte prioriteit.<br>→ Wandeling max<br>→ Slaap vroeg'},
+    40: {t:'wait', title:'🟠 Licht protocol', body:'Energie laag. Kies <strong>fundamentals</strong> of wandeling.<br>→ Geen emotionele gesprekken<br>→ Focus op herstel'},
+    60: {t:'advice', title:'🟡 Normaal protocol', body:'Energie normaal. Volg je <strong>standaard routine</strong>.<br>→ Core circuit of fundamentals<br>→ Focuswerk max 3u'},
+    80: {t:'go', title:'🟢 Kracht dag', body:'Energie goed. <strong>Pak de dag.</strong><br>→ Gymtraining of push/pull<br>→ Deep work 4u+ mogelijk'},
+    100:{t:'go', title:'⚡ Maximum output', body:'On fire. <strong>Dit is jouw dag.</strong><br>→ Zwaarste training<br>→ Pak je grootste uitdaging'},
+  };
+  const a = advice[cap];
+  const colors = {go:'var(--sage)',warn:'var(--rose)',wait:'var(--amber)',advice:'var(--ice)'};
+  document.getElementById('aiAdvies').innerHTML = `
+    <div class="ai-block ${a.t}" style="margin-bottom:12px">
+      <div class="ai-title" style="color:${colors[a.t]}">${a.title}</div>
+      <div class="ai-body">${a.body}</div>
+    </div>
+  `;
+
+  // Update training tab
+  renderWorkouts();
+  showToast('Energie opgeslagen in Notion');
+}
+
+// ═══ CHECKLIST ════════════════════════════
+function tc(el) {
+  el.classList.toggle('done');
+  saveChecks();
+}
+
+function saveChecks() {
+  const checks = [];
+  document.querySelectorAll('.ck').forEach((ck, i) => {
+    checks.push(ck.classList.contains('done'));
+  });
+  const today = new Date().toISOString().split('T')[0];
+  localStorage.setItem('checks_' + today, JSON.stringify(checks));
+}
+
+function loadChecks() {
+  const today = new Date().toISOString().split('T')[0];
+  const saved = JSON.parse(localStorage.getItem('checks_' + today) || '[]');
+  document.querySelectorAll('.ck').forEach((ck, i) => {
+    if (saved[i]) ck.classList.add('done');
+  });
+}
+
+// ═══ METRICS ══════════════════════════════
+function updateW(v) {
+  if (!v) return;
+  const w = parseFloat(v);
+  S.weight = w;
+  const pct = Math.max(0, Math.min(100, ((96-w)/19)*100));
+  document.getElementById('mW').textContent = w.toFixed(1);
+  document.getElementById('mWbar').style.width = Math.round(pct) + '%';
+  document.getElementById('mWpct').textContent = Math.round(pct) + '%';
+  document.getElementById('mWleft').textContent = Math.max(0, w-77).toFixed(1) + ' kg';
+  const bmi = (w / (1.72 * 1.72)).toFixed(1);
+  const bmiEl = document.getElementById('mBMI');
+  bmiEl.textContent = bmi;
+  bmiEl.style.color = parseFloat(bmi) < 25 ? 'var(--sage)' : parseFloat(bmi) < 30 ? 'var(--amber)' : 'var(--rose)';
+}
+
+function updateS(v) {
+  const s = parseInt(v) || 0;
+  S.steps = s;
+  const pct = Math.min(100, (s/10000)*100);
+  document.getElementById('mS').textContent = s.toLocaleString('nl-NL');
+  document.getElementById('mSbar').style.width = pct + '%';
+  document.getElementById('mSpct').textContent = Math.round(pct) + '%';
+}
+
+function spendB() {
+  const a = parseFloat(document.getElementById('bInput').value) || 0;
+  S.budget = Math.max(0, S.budget - a);
+  const pct = (S.budget / 80) * 100;
+  document.getElementById('mB').textContent = S.budget.toFixed(2);
+  document.getElementById('mBbar').style.width = pct + '%';
+  document.getElementById('mBpct').textContent = Math.round(pct) + '%';
+  document.getElementById('bInput').value = '';
+}
+
+function saveMetrics() {
+  localStorage.setItem('w', S.weight);
+  localStorage.setItem('s', S.steps);
+  localStorage.setItem('b', S.budget);
+  showToast('✓ Metrics opgeslagen');
+}
+
+function loadMetricsDisplay() {
+  updateW(S.weight);
+  updateS(S.steps);
+  const pct = (S.budget / 80) * 100;
+  document.getElementById('mB').textContent = S.budget.toFixed(2);
+  document.getElementById('mBbar').style.width = pct + '%';
+  document.getElementById('mBpct').textContent = Math.round(pct) + '%';
+  document.getElementById('wInput').value = S.weight;
+  document.getElementById('sInput').value = S.steps;
+}
+
+// ═══ REFLECTIE ════════════════════════════
+function saveRef() {
+  const g = document.getElementById('rG').value.trim();
+  const b = document.getElementById('rB').value.trim();
+  const l = document.getElementById('rL').value.trim();
+  const gr = document.getElementById('rGr').value.trim();
+  if (!g && !b) { showToast('Vul minimaal één veld in'); return; }
+  const today = new Date().toLocaleDateString('nl-NL', {day:'numeric',month:'long'});
+  S.refs.unshift({g,b,l,gr,date:today});
+  if (S.refs.length > 30) S.refs = S.refs.slice(0, 30);
+  localStorage.setItem('refs', JSON.stringify(S.refs));
+  renderRefs();
+  clearRef();
+  showToast('✓ Reflectie opgeslagen');
+}
+
+function clearRef() {
+  ['rG','rB','rL','rGr'].forEach(id => document.getElementById(id).value = '');
+}
+
+function renderRefs() {
+  const el = document.getElementById('refLog');
+  if (!S.refs.length) {
+    el.innerHTML = '<div style="font-size:11px;color:var(--dim);text-align:center;padding:24px 0">Begin vandaag met reflecteren.</div>';
+    return;
+  }
+  el.innerHTML = S.refs.slice(0,7).map(r => `
+    <div class="ref-entry">
+      <div class="ref-date">${r.date}</div>
+      ${r.g ? `<div class="ref-line"><span style="color:var(--sage)">+ </span>${r.g}</div>` : ''}
+      ${r.b ? `<div class="ref-line"><span style="color:var(--rose)">− </span>${r.b}</div>` : ''}
+      ${r.l ? `<div class="ref-line"><span style="color:var(--ice)">→ </span>${r.l}</div>` : ''}
+      ${r.gr ? `<div style="margin-top:6px"><span class="tag tag-gold">🙏 ${r.gr}</span></div>` : ''}
+    </div>
+  `).join('');
+}
+
+function loadRefs() { renderRefs(); }
+
+// ═══ NOTION STATUS CARD ═══════════════════
+function updateNotionStatusCard() {
+  const el = document.getElementById('notionStatus');
+  if (S.syncOk) {
+    el.innerHTML = `
+      <div class="sr"><span class="sr-l">Status</span><span class="sr-r tag tag-sage">✓ Verbonden</span></div>
+      <div class="sr"><span class="sr-l">Dag ID</span><span class="sr-r" style="font-size:9px;color:var(--dim)">${S.dagId ? S.dagId.substring(0,8)+'...' : '—'}</span></div>
+      <div class="sr"><span class="sr-l">Workouts</span><span class="sr-r">${S.workouts.length} geladen</span></div>
+      <div class="sr"><span class="sr-l">Sync</span><span class="sr-r" style="color:var(--sage)">Live</span></div>
+    `;
+  } else {
+    el.innerHTML = `
+      <div class="sr"><span class="sr-l">Status</span><span class="sr-r tag tag-rose">Offline</span></div>
+      <div class="sr"><span class="sr-l">Data</span><span class="sr-r" style="color:var(--amber)">Lokaal opgeslagen</span></div>
+    `;
+  }
+}
+
+// ═══ NAVIGATION ═══════════════════════════
+function goTo(id, el) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.remove('active');
+    const dot = n.querySelector('.nav-dot');
+    if (dot) dot.remove();
+  });
+  document.getElementById('view-' + id).classList.add('active');
+  el.classList.add('active');
+  const dot = document.createElement('div');
+  dot.className = 'nav-dot';
+  el.appendChild(dot);
+  document.getElementById('mainContent').scrollTo(0, 0);
+}
+
+// ═══ HELPERS ══════════════════════════════
+function updateClock() {
+  const n = new Date();
+  document.getElementById('clockEl').textContent =
+    String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0');
+}
+
+function setHeroDate() {
+  const n = new Date();
+  const days = ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'];
+  const months = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+  document.getElementById('heroDate').textContent =
+    (days[n.getDay()] + ' ' + n.getDate() + ' ' + months[n.getMonth()] + ' ' + n.getFullYear()).toUpperCase();
+}
+
+function setSyncStatus(state, text) {
+  const el = document.getElementById('syncStatus');
+  el.textContent = text;
+  el.style.color = state === 'ok' ? 'var(--sage)' : state === 'loading' ? 'var(--amber)' : 'var(--rose)';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ═══ START ════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  init();
+  loadChecks();
+});
+</script>
+</body>
+</html>
