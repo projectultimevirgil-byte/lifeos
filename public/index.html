@@ -10,447 +10,625 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;0,700;1,300;1,700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #07080f; --s1: #0d0f18; --s2: #13151f; --s3: #1a1c28; --s4: #222436;
-  --line: #1e2132; --line2: #272a3d; --ghost: #363a52; --text: #e2e5f5; --dim: #555a78;
-  --gold: #c8a84a; --gold2: #f0cc76; --gold-g: rgba(200,168,74,0.1);
-  --sage: #6fcf97; --sage-g: rgba(111,207,151,0.1);
-  --rose: #e07b6a; --rose-g: rgba(224,123,106,0.1);
-  --ice: #7eb8d4; --ice-g: rgba(126,184,212,0.1);
-  --amber: #e8a840; --amber-g: rgba(232,168,64,0.08);
-  --purple: #9b8aff; --purple-g: rgba(155,138,255,0.1);
-  --safe: env(safe-area-inset-bottom, 0px);
+  --bg:#07080f;--s1:#0d0f18;--s2:#13151f;--s3:#1a1c28;--s4:#222436;
+  --line:#1e2132;--line2:#272a3d;--ghost:#363a52;--text:#e2e5f5;--dim:#555a78;
+  --gold:#c8a84a;--gold2:#f0cc76;--gold-g:rgba(200,168,74,0.1);
+  --sage:#6fcf97;--sage-g:rgba(111,207,151,0.1);
+  --rose:#e07b6a;--rose-g:rgba(224,123,106,0.1);
+  --ice:#7eb8d4;--ice-g:rgba(126,184,212,0.1);
+  --amber:#e8a840;--amber-g:rgba(232,168,64,0.08);
+  --purple:#9b8aff;--purple-g:rgba(155,138,255,0.1);
+  --safe:env(safe-area-inset-bottom,0px);
 }
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; }
-.statusbar { height: 44px; background: rgba(7,8,15,0.95); display: flex; align-items: flex-end; padding: 0 20px 8px; font-size: 10px; color: var(--dim); letter-spacing: 1px; flex-shrink: 0; border-bottom: 1px solid var(--line); justify-content: space-between; }
-.sb-left { display: flex; align-items: center; gap: 8px; }
-.sb-pulse { width: 5px; height: 5px; background: var(--sage); border-radius: 50%; box-shadow: 0 0 6px rgba(111,207,151,0.6); animation: pulse 2s ease-in-out infinite; }
-@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.3)} }
-.app { display: flex; flex-direction: column; height: 100%; }
-.content { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
-.content::-webkit-scrollbar { display: none; }
-.nav { height: calc(64px + var(--safe)); min-height: 64px; background: rgba(7,8,15,0.97); backdrop-filter: blur(20px); border-top: 1px solid var(--line); display: flex; align-items: flex-start; padding-top: 8px; flex-shrink: 0; z-index: 100; }
-.nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; padding: 4px 0; transition: all .15s; }
-.nav-icon { font-size: 17px; line-height: 1; transition: transform .15s; }
-.nav-label { font-size: 7px; color: var(--dim); letter-spacing: .5px; transition: color .15s; }
-.nav-item.active .nav-label { color: var(--gold); }
-.nav-item.active .nav-icon { transform: scale(1.1); }
-.nav-dot { width: 3px; height: 3px; background: var(--gold); border-radius: 50%; margin-top: -1px; }
-.view { display: none; padding: 20px 16px 24px; animation: fadeUp .2s ease; }
-.view.active { display: block; }
-@keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-.vh { margin-bottom: 20px; }
-.vh-tag { font-size: 8px; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; margin-bottom: 5px; }
-.vh-title { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 300; letter-spacing: -1px; line-height: 1.1; }
-.vh-title em { font-style: italic; color: var(--gold); }
-.card { background: var(--s2); border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
-.card.gold { border-color: rgba(200,168,74,0.25); background: linear-gradient(145deg, var(--s2), rgba(200,168,74,0.04)); }
-.card.inset { background: var(--s3); border-color: var(--line2); }
-.card.sage { border-color: rgba(111,207,151,0.2); background: linear-gradient(145deg, var(--s2), rgba(111,207,151,0.03)); }
-.card.ice { border-color: rgba(126,184,212,0.2); }
-.card.rose { border-color: rgba(224,123,106,0.2); background: linear-gradient(145deg, var(--s2), rgba(224,123,106,0.03)); }
-.card.purple { border-color: rgba(155,138,255,0.2); background: linear-gradient(145deg, var(--s2), rgba(155,138,255,0.03)); }
-.ct { font-size: 11px; font-weight: 500; color: var(--text); margin-bottom: 12px; }
-.ce { font-size: 8px; letter-spacing: 2.5px; color: var(--dim); text-transform: uppercase; margin-bottom: 6px; }
-.hero { background: var(--s2); border: 1px solid var(--line); border-radius: 16px; padding: 20px; margin-bottom: 14px; position: relative; overflow: hidden; }
-.hero::after { content: ''; position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: radial-gradient(circle, rgba(200,168,74,.07) 0%, transparent 70%); pointer-events: none; }
-.hero-date { font-size: 9px; letter-spacing: 2px; color: var(--dim); margin-bottom: 8px; }
-.hero-name { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 300; letter-spacing: -.8px; margin-bottom: 4px; }
-.hero-name em { font-style: italic; color: var(--gold); }
-.hero-sub { font-size: 10px; color: var(--dim); }
-.en-row { display: grid; grid-template-columns: repeat(5,1fr); gap: 6px; margin: 10px 0; }
-.en-opt { background: var(--s3); border: 1px solid var(--line2); border-radius: 10px; padding: 10px 4px; text-align: center; cursor: pointer; transition: all .15s; }
-.en-opt.sel { border-color: var(--gold); background: var(--gold-g); }
-.en-opt .ei { font-size: 18px; margin-bottom: 3px; }
-.en-opt .el { font-size: 7.5px; color: var(--dim); }
-.en-opt.sel .el { color: var(--gold); }
-.cap-bar { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
-.cap-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
-.cap-lbl { font-size: 8px; letter-spacing: 2px; color: var(--dim); }
-.cap-val { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 300; color: var(--gold); }
-.cap-track { height: 3px; background: var(--line2); border-radius: 3px; overflow: hidden; }
-.cap-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--sage), var(--gold), var(--rose)); transition: width .8s cubic-bezier(.4,0,.2,1); }
-.ai-block { border-radius: 12px; padding: 14px; margin-bottom: 10px; border-left: 3px solid; }
-.ai-block.advice { background: rgba(126,184,212,.07); border-color: var(--ice); }
-.ai-block.go { background: var(--sage-g); border-color: var(--sage); }
-.ai-block.warn { background: var(--rose-g); border-color: var(--rose); }
-.ai-block.wait { background: var(--amber-g); border-color: var(--amber); }
-.ai-block.faith { background: var(--purple-g); border-color: var(--purple); }
-.ai-title { font-size: 10px; font-weight: 500; margin-bottom: 5px; }
-.ai-body { font-size: 10.5px; color: var(--dim); line-height: 1.75; }
-.ai-body strong { color: var(--text); font-weight: 500; }
-.ck { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid rgba(30,33,50,.8); cursor: pointer; }
-.ck:last-child { border-bottom: none; }
-.ck.done { opacity: .28; }
-.ck-box { width: 16px; height: 16px; border: 1.5px solid var(--ghost); border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .15s; }
-.ck.done .ck-box { background: var(--sage); border-color: var(--sage); }
-.ck.done .ck-box::after { content: '✓'; font-size: 9px; color: #07080f; font-weight: 700; }
-.ck.done .ck-lbl { text-decoration: line-through; }
-.ck-lbl { font-size: 11.5px; flex: 1; }
-.ck-time { font-size: 8.5px; color: var(--dim); flex-shrink: 0; }
-.wo { background: var(--s3); border: 1px solid var(--line2); border-radius: 12px; padding: 13px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
-.wo.disabled { opacity: .22; }
-.wo-ico { width: 38px; height: 38px; border-radius: 10px; background: var(--s4); display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
-.wo-body { flex: 1; min-width: 0; }
-.wo-name { font-size: 12px; font-weight: 500; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.wo-meta { font-size: 9.5px; color: var(--dim); }
-.wo-load { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; flex-shrink: 0; }
-.wl-bar { width: 44px; height: 2px; background: var(--line2); border-radius: 2px; overflow: hidden; }
-.wl-fill { height: 100%; border-radius: 2px; }
-.wl-val { font-size: 8px; color: var(--dim); }
-.wo-check { width: 20px; height: 20px; border: 1.5px solid var(--ghost); border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; transition: all .15s; }
-.wo-check.done { background: var(--sage); border-color: var(--sage); }
-.wo-check.done::after { content: '✓'; font-size: 10px; color: #07080f; font-weight: 700; }
-.metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-.metric { background: var(--s2); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
-.m-label { font-size: 8px; letter-spacing: 2px; color: var(--dim); text-transform: uppercase; margin-bottom: 8px; }
-.m-val { font-family: 'Fraunces', serif; font-size: 34px; font-weight: 300; line-height: 1; letter-spacing: -1.5px; }
-.m-unit { font-size: 12px; color: var(--dim); margin-left: 2px; font-family: 'DM Mono', monospace; }
-.m-sub { font-size: 9px; color: var(--dim); margin-top: 5px; }
-.pb { margin-top: 8px; }
-.pb-row { display: flex; justify-content: space-between; font-size: 9px; color: var(--dim); margin-bottom: 3px; }
-.pbt { height: 2px; background: var(--line2); border-radius: 2px; overflow: hidden; }
-.pbf { height: 100%; border-radius: 2px; transition: width 1s ease; }
-.pbf.gold { background: linear-gradient(90deg, var(--gold), var(--gold2)); }
-.pbf.sage { background: linear-gradient(90deg, var(--sage), #9de8bb); }
-.pbf.ice { background: linear-gradient(90deg, var(--ice), #a8d8ec); }
-.pbf.purple { background: linear-gradient(90deg, var(--purple), #c0b5ff); }
-input, textarea, select { background: var(--s3); border: 1px solid var(--line2); border-radius: 10px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; padding: 11px 13px; width: 100%; outline: none; transition: border-color .15s; -webkit-appearance: none; }
-input:focus, textarea:focus, select:focus { border-color: rgba(200,168,74,.4); }
-textarea { resize: none; line-height: 1.6; }
-label { display: block; font-size: 8px; letter-spacing: 2px; color: var(--dim); text-transform: uppercase; margin-bottom: 5px; }
-.fg { margin-bottom: 11px; }
-.btn { padding: 12px 18px; border-radius: 12px; font-size: 11.5px; font-family: 'DM Mono', monospace; font-weight: 500; cursor: pointer; border: none; transition: all .12s; letter-spacing: .3px; width: 100%; }
-.btn-gold { background: var(--gold); color: #07080f; font-weight: 600; }
-.btn-gold:active { transform: scale(.98); }
-.btn-ghost { background: transparent; border: 1px solid var(--line2); color: var(--dim); }
-.btn-row { display: flex; gap: 8px; }
-.btn-row .btn { flex: 1; }
-.tag { display: inline-flex; align-items: center; font-size: 9px; padding: 3px 9px; border-radius: 20px; font-weight: 500; }
-.tag-gold { background: var(--gold-g); color: var(--gold); border: 1px solid rgba(200,168,74,.2); }
-.tag-sage { background: var(--sage-g); color: var(--sage); border: 1px solid rgba(111,207,151,.2); }
-.tag-rose { background: var(--rose-g); color: var(--rose); border: 1px solid rgba(224,123,106,.2); }
-.tag-ice { background: var(--ice-g); color: var(--ice); border: 1px solid rgba(126,184,212,.2); }
-.tag-purple { background: var(--purple-g); color: var(--purple); border: 1px solid rgba(155,138,255,.2); }
-.loading { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 32px 0; font-size: 10px; color: var(--dim); }
-.spin { width: 14px; height: 14px; border: 2px solid var(--line2); border-top-color: var(--gold); border-radius: 50%; animation: spin .7s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.toast { position: fixed; bottom: calc(80px + var(--safe)); left: 50%; transform: translateX(-50%) translateY(20px); background: var(--s4); border: 1px solid var(--line2); border-radius: 20px; padding: 8px 16px; font-size: 11px; color: var(--text); z-index: 1000; opacity: 0; transition: all .25s; white-space: nowrap; }
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-.sr { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid rgba(30,33,50,.8); font-size: 11px; }
-.sr:last-child { border-bottom: none; }
-.sr-l { color: var(--dim); }
-.sr-r { font-weight: 500; }
-.ref-entry { background: var(--s3); border: 1px solid var(--line2); border-radius: 12px; padding: 13px; margin-bottom: 8px; }
-.ref-date { font-size: 8px; color: var(--dim); letter-spacing: 1.5px; margin-bottom: 7px; }
-.ref-line { font-size: 11px; margin-bottom: 4px; line-height: 1.6; color: var(--dim); }
-.div { height: 1px; background: var(--line); margin: 14px 0; }
-.bible-verse { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 300; font-style: italic; line-height: 1.6; color: var(--text); padding: 16px 0 8px; }
-.bible-ref { font-size: 9px; letter-spacing: 2px; color: var(--gold); margin-bottom: 12px; }
-.bible-question { font-size: 11px; color: var(--dim); line-height: 1.7; padding-bottom: 4px; }
-.rel-fase { display: flex; gap: 6px; margin: 10px 0; }
-.rel-fase-item { flex: 1; background: var(--s3); border: 1px solid var(--line2); border-radius: 8px; padding: 8px 4px; text-align: center; font-size: 7.5px; color: var(--dim); }
-.rel-fase-item.active { border-color: var(--rose); background: var(--rose-g); color: var(--rose); }
-.rel-fase-item.done { border-color: var(--sage); background: var(--sage-g); color: var(--sage); }
-.rel-fase-icon { font-size: 14px; margin-bottom: 3px; }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;font-size:13px;}
+.statusbar{height:44px;background:rgba(7,8,15,0.95);display:flex;align-items:flex-end;padding:0 20px 8px;font-size:10px;color:var(--dim);letter-spacing:1px;flex-shrink:0;border-bottom:1px solid var(--line);justify-content:space-between;}
+.sb-left{display:flex;align-items:center;gap:8px;}
+.sb-pulse{width:5px;height:5px;background:var(--sage);border-radius:50%;box-shadow:0 0 6px rgba(111,207,151,0.6);animation:pulse 2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+.app{display:flex;flex-direction:column;height:100%;}
+.content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
+.content::-webkit-scrollbar{display:none;}
+.nav{height:calc(64px + var(--safe));min-height:64px;background:rgba(7,8,15,0.97);backdrop-filter:blur(20px);border-top:1px solid var(--line);display:flex;align-items:flex-start;padding-top:8px;flex-shrink:0;z-index:100;}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0;transition:all .15s;}
+.nav-icon{font-size:17px;line-height:1;transition:transform .15s;}
+.nav-label{font-size:7px;color:var(--dim);letter-spacing:.5px;transition:color .15s;}
+.nav-item.active .nav-label{color:var(--gold);}
+.nav-item.active .nav-icon{transform:scale(1.1);}
+.nav-dot{width:3px;height:3px;background:var(--gold);border-radius:50%;margin-top:-1px;}
+.view{display:none;padding:20px 16px 24px;animation:fadeUp .2s ease;}
+.view.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.vh{margin-bottom:20px;}
+.vh-tag{font-size:8px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:5px;}
+.vh-title{font-family:'Fraunces',serif;font-size:28px;font-weight:300;letter-spacing:-1px;line-height:1.1;}
+.vh-title em{font-style:italic;color:var(--gold);}
+.card{background:var(--s2);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px;}
+.card.gold{border-color:rgba(200,168,74,0.25);background:linear-gradient(145deg,var(--s2),rgba(200,168,74,0.04));}
+.card.inset{background:var(--s3);border-color:var(--line2);}
+.card.sage{border-color:rgba(111,207,151,0.2);background:linear-gradient(145deg,var(--s2),rgba(111,207,151,0.03));}
+.card.ice{border-color:rgba(126,184,212,0.2);}
+.card.rose{border-color:rgba(224,123,106,0.2);background:linear-gradient(145deg,var(--s2),rgba(224,123,106,0.03));}
+.card.purple{border-color:rgba(155,138,255,0.2);background:linear-gradient(145deg,var(--s2),rgba(155,138,255,0.03));}
+.ct{font-size:11px;font-weight:500;color:var(--text);margin-bottom:12px;}
+.ce{font-size:8px;letter-spacing:2.5px;color:var(--dim);text-transform:uppercase;margin-bottom:6px;}
+.hero{background:var(--s2);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:14px;position:relative;overflow:hidden;}
+.hero::after{content:'';position:absolute;top:-60px;right:-60px;width:180px;height:180px;background:radial-gradient(circle,rgba(200,168,74,.07) 0%,transparent 70%);pointer-events:none;}
+.hero-date{font-size:9px;letter-spacing:2px;color:var(--dim);margin-bottom:8px;}
+.hero-name{font-family:'Fraunces',serif;font-size:26px;font-weight:300;letter-spacing:-.8px;margin-bottom:4px;}
+.hero-name em{font-style:italic;color:var(--gold);}
+.hero-sub{font-size:10px;color:var(--dim);}
+.en-row{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:10px 0;}
+.en-opt{background:var(--s3);border:1px solid var(--line2);border-radius:10px;padding:10px 4px;text-align:center;cursor:pointer;transition:all .15s;}
+.en-opt.sel{border-color:var(--gold);background:var(--gold-g);}
+.en-opt .ei{font-size:18px;margin-bottom:3px;}
+.en-opt .el{font-size:7.5px;color:var(--dim);}
+.en-opt.sel .el{color:var(--gold);}
+.ai-block{border-radius:12px;padding:14px;margin-bottom:10px;border-left:3px solid;}
+.ai-block.advice{background:rgba(126,184,212,.07);border-color:var(--ice);}
+.ai-block.go{background:var(--sage-g);border-color:var(--sage);}
+.ai-block.warn{background:var(--rose-g);border-color:var(--rose);}
+.ai-block.wait{background:var(--amber-g);border-color:var(--amber);}
+.ai-block.faith{background:var(--purple-g);border-color:var(--purple);}
+.ai-loading{display:flex;align-items:center;gap:8px;padding:14px;font-size:10px;color:var(--dim);}
+.ai-title{font-size:10px;font-weight:500;margin-bottom:5px;}
+.ai-body{font-size:10.5px;color:var(--dim);line-height:1.75;}
+.ai-body strong{color:var(--text);font-weight:500;}
+.ck{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(30,33,50,.8);cursor:pointer;}
+.ck:last-child{border-bottom:none;}
+.ck.done{opacity:.28;}
+.ck-box{width:16px;height:16px;border:1.5px solid var(--ghost);border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
+.ck.done .ck-box{background:var(--sage);border-color:var(--sage);}
+.ck.done .ck-box::after{content:'✓';font-size:9px;color:#07080f;font-weight:700;}
+.ck.done .ck-lbl{text-decoration:line-through;}
+.ck-lbl{font-size:11.5px;flex:1;}
+.ck-time{font-size:8.5px;color:var(--dim);flex-shrink:0;}
+/* Streak bar */
+.streak-row{display:flex;gap:5px;margin:10px 0 4px;}
+.streak-day{flex:1;height:28px;border-radius:6px;background:var(--s3);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font-size:8px;color:var(--dim);flex-direction:column;gap:1px;}
+.streak-day.done{background:var(--sage-g);border-color:rgba(111,207,151,0.3);color:var(--sage);}
+.streak-day.partial{background:var(--amber-g);border-color:rgba(232,168,64,0.3);color:var(--amber);}
+.streak-day.missed{background:var(--rose-g);border-color:rgba(224,123,106,0.2);color:var(--rose);}
+.streak-score{font-family:'Fraunces',serif;font-size:32px;font-weight:300;color:var(--gold);}
+/* Workout */
+.wo{background:var(--s3);border:1px solid var(--line2);border-radius:12px;padding:13px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+.wo.disabled{opacity:.22;}
+.wo-ico{width:38px;height:38px;border-radius:10px;background:var(--s4);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.wo-body{flex:1;min-width:0;}
+.wo-name{font-size:12px;font-weight:500;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.wo-meta{font-size:9.5px;color:var(--dim);}
+.wo-load{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0;}
+.wl-bar{width:44px;height:2px;background:var(--line2);border-radius:2px;overflow:hidden;}
+.wl-fill{height:100%;border-radius:2px;}
+.wl-val{font-size:8px;color:var(--dim);}
+.wo-check{width:20px;height:20px;border:1.5px solid var(--ghost);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;transition:all .15s;}
+.wo-check.done{background:var(--sage);border-color:var(--sage);}
+.wo-check.done::after{content:'✓';font-size:10px;color:#07080f;font-weight:700;}
+/* Metrics */
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.metric{background:var(--s2);border:1px solid var(--line);border-radius:14px;padding:14px;}
+.m-label{font-size:8px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:8px;}
+.m-val{font-family:'Fraunces',serif;font-size:34px;font-weight:300;line-height:1;letter-spacing:-1.5px;}
+.m-unit{font-size:12px;color:var(--dim);margin-left:2px;font-family:'DM Mono',monospace;}
+.m-sub{font-size:9px;color:var(--dim);margin-top:5px;}
+.pb{margin-top:8px;}
+.pb-row{display:flex;justify-content:space-between;font-size:9px;color:var(--dim);margin-bottom:3px;}
+.pbt{height:2px;background:var(--line2);border-radius:2px;overflow:hidden;}
+.pbf{height:100%;border-radius:2px;transition:width 1s ease;}
+.pbf.gold{background:linear-gradient(90deg,var(--gold),var(--gold2));}
+.pbf.sage{background:linear-gradient(90deg,var(--sage),#9de8bb);}
+.pbf.ice{background:linear-gradient(90deg,var(--ice),#a8d8ec);}
+.pbf.purple{background:linear-gradient(90deg,var(--purple),#c0b5ff);}
+/* Finance */
+.fin-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(30,33,50,.8);font-size:11px;}
+.fin-row:last-child{border-bottom:none;}
+.fin-cat{font-size:9px;color:var(--dim);}
+.fin-amount{font-weight:500;}
+.fin-amount.out{color:var(--rose);}
+.fin-amount.in{color:var(--sage);}
+/* Budget ring */
+.budget-ring{display:flex;align-items:center;gap:16px;padding:8px 0;}
+.ring-wrap{position:relative;width:72px;height:72px;flex-shrink:0;}
+.ring-svg{transform:rotate(-90deg);}
+.ring-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}
+.ring-val{font-family:'Fraunces',serif;font-size:18px;font-weight:300;line-height:1;}
+.ring-unit{font-size:7px;color:var(--dim);}
+/* Profiel */
+.phase-badge{display:inline-flex;align-items:center;gap:6px;background:var(--s3);border:1px solid var(--line2);border-radius:20px;padding:6px 12px;font-size:10px;margin-bottom:8px;}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.stat-cell{background:var(--s3);border:1px solid var(--line2);border-radius:12px;padding:12px;}
+.stat-val{font-family:'Fraunces',serif;font-size:24px;font-weight:300;color:var(--gold);}
+.stat-lbl{font-size:8px;color:var(--dim);letter-spacing:1.5px;margin-top:3px;}
+/* KPI */
+.kpi-input-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+/* Forms */
+input,textarea,select{background:var(--s3);border:1px solid var(--line2);border-radius:10px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;padding:11px 13px;width:100%;outline:none;transition:border-color .15s;-webkit-appearance:none;}
+input:focus,textarea:focus,select:focus{border-color:rgba(200,168,74,.4);}
+textarea{resize:none;line-height:1.6;}
+label{display:block;font-size:8px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:5px;}
+.fg{margin-bottom:11px;}
+.btn{padding:12px 18px;border-radius:12px;font-size:11.5px;font-family:'DM Mono',monospace;font-weight:500;cursor:pointer;border:none;transition:all .12s;letter-spacing:.3px;width:100%;}
+.btn-gold{background:var(--gold);color:#07080f;font-weight:600;}
+.btn-gold:active{transform:scale(.98);}
+.btn-ghost{background:transparent;border:1px solid var(--line2);color:var(--dim);}
+.btn-sm{padding:8px 12px;font-size:10px;width:auto;}
+.btn-row{display:flex;gap:8px;}
+.btn-row .btn{flex:1;}
+.tag{display:inline-flex;align-items:center;font-size:9px;padding:3px 9px;border-radius:20px;font-weight:500;}
+.tag-gold{background:var(--gold-g);color:var(--gold);border:1px solid rgba(200,168,74,.2);}
+.tag-sage{background:var(--sage-g);color:var(--sage);border:1px solid rgba(111,207,151,.2);}
+.tag-rose{background:var(--rose-g);color:var(--rose);border:1px solid rgba(224,123,106,.2);}
+.tag-ice{background:var(--ice-g);color:var(--ice);border:1px solid rgba(126,184,212,.2);}
+.tag-amber{background:var(--amber-g);color:var(--amber);border:1px solid rgba(232,168,64,.2);}
+.loading{display:flex;align-items:center;justify-content:center;gap:8px;padding:32px 0;font-size:10px;color:var(--dim);}
+.spin{width:14px;height:14px;border:2px solid var(--line2);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:calc(80px + var(--safe));left:50%;transform:translateX(-50%) translateY(20px);background:var(--s4);border:1px solid var(--line2);border-radius:20px;padding:8px 16px;font-size:11px;color:var(--text);z-index:1000;opacity:0;transition:all .25s;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.sr{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(30,33,50,.8);font-size:11px;}
+.sr:last-child{border-bottom:none;}
+.sr-l{color:var(--dim);}
+.sr-r{font-weight:500;}
+.ref-entry{background:var(--s3);border:1px solid var(--line2);border-radius:12px;padding:13px;margin-bottom:8px;}
+.ref-date{font-size:8px;color:var(--dim);letter-spacing:1.5px;margin-bottom:7px;}
+.ref-line{font-size:11px;margin-bottom:4px;line-height:1.6;color:var(--dim);}
+.div{height:1px;background:var(--line);margin:14px 0;}
+.bible-verse{font-family:'Fraunces',serif;font-size:16px;font-weight:300;font-style:italic;line-height:1.6;color:var(--text);padding:16px 0 8px;}
+.bible-ref{font-size:9px;letter-spacing:2px;color:var(--gold);margin-bottom:12px;}
+.bible-question{font-size:11px;color:var(--dim);line-height:1.7;padding-bottom:4px;}
+.cap-bar{margin-top:14px;padding-top:14px;border-top:1px solid var(--line);}
+.cap-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
+.cap-lbl{font-size:8px;letter-spacing:2px;color:var(--dim);}
+.cap-val{font-family:'Fraunces',serif;font-size:22px;font-weight:300;color:var(--gold);}
+.cap-track{height:3px;background:var(--line2);border-radius:3px;overflow:hidden;}
+.cap-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--sage),var(--gold),var(--rose));transition:width .8s cubic-bezier(.4,0,.2,1);}
 </style>
 </head>
 <body>
 <div class="app">
   <div class="statusbar">
-    <div class="sb-left">
-      <div class="sb-pulse"></div>
-      <span id="clockEl">00:00</span>
-    </div>
-    <span id="syncStatus" style="color:var(--amber)">VERBINDEN...</span>
+    <div class="sb-left"><div class="sb-pulse"></div><span id="syncStatus">LADEN...</span></div>
+    <span id="clockEl">--:--</span>
   </div>
   <div class="content" id="mainContent">
 
-    <!-- VANDAAG -->
+    <!-- ══ VANDAAG ══════════════════════════════════════════ -->
     <div class="view active" id="view-vandaag">
       <div class="hero">
-        <div class="hero-date" id="heroDate"></div>
-        <div class="hero-name" id="heroGreet">Goedemorgen, <em>Virgil.</em></div>
-        <div class="hero-sub" id="heroSub">Dag voor dag. Consistentie wint.</div>
+        <div class="hero-date" id="heroDate">—</div>
+        <div class="hero-name" id="heroGreet">Life OS</div>
+        <div class="hero-sub" id="heroSub">Fundament fase · 2026</div>
         <div class="cap-bar">
-          <div class="cap-row"><span class="cap-lbl">DAGCAPACITEIT</span><span class="cap-val" id="capVal">—</span></div>
+          <div class="cap-row"><span class="cap-lbl">ENERGIE</span><span class="cap-val" id="capVal">—</span></div>
           <div class="cap-track"><div class="cap-fill" id="capFill" style="width:0%"></div></div>
         </div>
       </div>
-      <div class="card">
-        <div class="ce">Energie vandaag</div>
+
+      <!-- Energie selector -->
+      <div class="card inset">
+        <div class="ce">Hoe voel jij je vandaag?</div>
         <div class="en-row">
-          <div class="en-opt" onclick="setEnergy(this,20,'UITGEPUT')"><div class="ei">🔴</div><div class="el">UITGEPUT</div></div>
-          <div class="en-opt" onclick="setEnergy(this,40,'LAAG')"><div class="ei">🟠</div><div class="el">LAAG</div></div>
-          <div class="en-opt" onclick="setEnergy(this,60,'NORMAAL')"><div class="ei">🟡</div><div class="el">NORMAAL</div></div>
-          <div class="en-opt" onclick="setEnergy(this,80,'GOED')"><div class="ei">🟢</div><div class="el">GOED</div></div>
-          <div class="en-opt" onclick="setEnergy(this,100,'ON FIRE')"><div class="ei">⚡</div><div class="el">ON FIRE</div></div>
+          <div class="en-opt" onclick="setEnergy(this,20,'💀')"><div class="ei">💀</div><div class="el">LEEG</div></div>
+          <div class="en-opt" onclick="setEnergy(this,40,'😔')"><div class="ei">😔</div><div class="el">LAAG</div></div>
+          <div class="en-opt" onclick="setEnergy(this,60,'😐')"><div class="ei">😐</div><div class="el">NORMAAL</div></div>
+          <div class="en-opt" onclick="setEnergy(this,80,'💪')"><div class="ei">💪</div><div class="el">GOED</div></div>
+          <div class="en-opt" onclick="setEnergy(this,100,'🔥')"><div class="ei">🔥</div><div class="el">ON FIRE</div></div>
         </div>
       </div>
-      <div id="aiAdvies"></div>
-      <div class="card">
-        <div class="ct">🌅 Ochtend</div>
-        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Stilte & Gebed</span><span class="ck-time">06:00</span></div>
-        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Bijbel lezen</span><span class="ck-time">06:15</span></div>
-        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Dagelijkse Fundamentals</span><span class="ck-time">06:45</span></div>
-        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Enkel Bulletproof</span><span class="ck-time">07:20</span></div>
-        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Gezond ontbijt</span><span class="ck-time">08:00</span></div>
+
+      <!-- AI Advies -->
+      <div id="aiAdviesWrap">
+        <div class="ai-loading"><div class="spin"></div><span>AI laadt dagadvies...</span></div>
       </div>
+
+      <!-- Streak deze week -->
       <div class="card">
-        <div class="ct">☀️ Overdag</div>
-        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Wandeling buiten — 30 min</span><span class="ck-time">09:00</span></div>
-        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Freelance leren — 2u</span><span class="ck-time">Make.com</span></div>
-        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Basic Fit of loopband</span><span class="ck-time">14:30</span></div>
-        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Budget bijhouden</span><span class="ck-time">€80</span></div>
-        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Tijd Neyla & Diego</span><span class="ck-time">Vader</span></div>
+        <div class="ce">Streak — Dagelijks minimum</div>
+        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;">
+          <span class="streak-score" id="streakScore">0</span>
+          <span style="font-size:10px;color:var(--dim)">/7 deze week</span>
+        </div>
+        <div class="streak-row" id="streakBar">
+          <!-- Dynamisch gevuld -->
+        </div>
+        <div style="font-size:9px;color:var(--dim);margin-top:6px;" id="streakLabel">Begin vandaag.</div>
       </div>
+
+      <!-- Dagelijkse minimum checklist -->
+      <div class="card gold">
+        <div class="ce">Dagelijks minimum</div>
+        <div class="ck" onclick="tc(this)" id="ck0"><div class="ck-box"></div><span class="ck-lbl">✝️ Stilte &amp; Gebed</span><span class="ck-time">30 min</span></div>
+        <div class="ck" onclick="tc(this)" id="ck1"><div class="ck-box"></div><span class="ck-lbl">💪 Dagelijkse Fundamentals</span><span class="ck-time">35 min</span></div>
+        <div class="ck" onclick="tc(this)" id="ck2"><div class="ck-box"></div><span class="ck-lbl">🦶 Enkel Bulletproof</span><span class="ck-time">20 min</span></div>
+        <div class="ck" onclick="tc(this)" id="ck3"><div class="ck-box"></div><span class="ck-lbl">👟 10.000 stappen / loopband</span><span class="ck-time">40 min</span></div>
+        <div class="ck" onclick="tc(this)" id="ck4"><div class="ck-box"></div><span class="ck-lbl">📝 Avond reflectie schrijven</span><span class="ck-time">10 min</span></div>
+        <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--line);">
+          <button class="btn btn-gold" onclick="saveDagMinimum()">✓ Dag afsluiten</button>
+        </div>
+      </div>
+
+      <!-- Ochtend / Overdag / Avond -->
       <div class="card">
-        <div class="ct">🌙 Avond</div>
-        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Incline walking — 40 min</span><span class="ck-time">20:00</span></div>
-        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Dagreflectie schrijven</span><span class="ck-time">20:45</span></div>
-        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Gebed</span><span class="ck-time">21:00</span></div>
-        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Geen scherm na 21:30</span><span class="ck-time">21:30</span></div>
-        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Slaap voor 22:00</span><span class="ck-time">22:00</span></div>
+        <div class="ce">Dag planning</div>
+        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">☀️ 06:00 Opstaan, geen telefoon</span></div>
+        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">🍳 08:00 Eiwitrijk ontbijt</span></div>
+        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">🚶 09:00 Wandeling buiten 30 min</span></div>
+        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">💻 10:00 Freelance leren 2u</span></div>
+        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">🏋️ 14:30 Basic Fit (ma/wo/vr)</span></div>
+        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">🏃 20:00 Loopband 40 min incline</span></div>
+        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">🌙 21:00 Gebed & stilte</span></div>
+        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">💤 22:00 Slaap</span></div>
       </div>
     </div>
 
-    <!-- TRAINING -->
+    <!-- ══ TRAINING ══════════════════════════════════════════ -->
     <div class="view" id="view-training">
-      <div class="vh"><div class="vh-tag">Lichaam — Systeem</div><div class="vh-title">Training <em>Engine</em></div></div>
-      <div id="trainingLoading" class="loading"><div class="spin"></div>Notion laden...</div>
-      <div id="trainingContent" style="display:none">
-        <div id="gekozenBlock"></div>
-        <div class="div"></div>
-        <div class="ce" style="margin-bottom:10px">Alle workouts</div>
-        <div id="woList"></div>
+      <div class="vh"><div class="vh-tag">Module 02</div><div class="vh-title">Trai<em>ning</em></div></div>
+      <div id="gekozenBlock"><div class="loading"><div class="spin"></div>Laden...</div></div>
+      <div class="card inset">
+        <div class="ce">Alle workouts</div>
+        <div id="trainingLoading" class="loading"><div class="spin"></div>Workouts laden...</div>
+        <div id="woList" style="display:none"></div>
       </div>
     </div>
 
-    <!-- GELOOF -->
-    <div class="view" id="view-geloof">
-      <div class="vh"><div class="vh-tag">Fundament — Geloof</div><div class="vh-title">Tijd met <em>God</em></div></div>
-      <div class="card purple">
-        <div class="ce">Vers van de dag</div>
-        <div id="bibleVerse" class="bible-verse">"Laden..."</div>
-        <div id="bibleRef" class="bible-ref"></div>
-        <div id="bibleQuestion" class="bible-question"></div>
-      </div>
-      <div class="card inset">
-        <div class="ct">✍️ Mijn antwoord vandaag</div>
-        <div class="fg"><textarea id="bibleAnswer" rows="3" placeholder="Schrijf eerlijk wat God je zegt..."></textarea></div>
-        <button class="btn btn-ghost" onclick="saveBibleAnswer()">Opslaan</button>
-      </div>
-      <div class="card">
-        <div class="ct">🙏 Gebed voor deze fase</div>
-        <div class="ai-block faith">
-          <div class="ai-body" style="font-family:'Fraunces',serif;font-size:13px;font-style:italic;color:var(--text);line-height:1.9">
-            "Heer, U kent mij volledig en houdt nog steeds van mij.<br>
-            Help mij de man te worden die U in mij ziet.<br>
-            Geef mij discipline waar ik zwak ben.<br>
-            Geef mij rust waar ik onrustig ben.<br>
-            Help mij een vader te zijn die zijn kinderen laat zien wie U bent.<br>
-            Amen."
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="ct">📖 Thema's deze maand</div>
-        <div class="sr"><span class="sr-l">Week 1</span><span class="sr-r tag tag-purple">Identiteit</span></div>
-        <div class="sr"><span class="sr-l">Week 2</span><span class="sr-r tag tag-gold">Vaderschap</span></div>
-        <div class="sr"><span class="sr-l">Week 3</span><span class="sr-r tag tag-sage">Discipline</span></div>
-        <div class="sr"><span class="sr-l">Week 4</span><span class="sr-r tag tag-ice">Rust & Loslaten</span></div>
-      </div>
-      <div class="card inset">
-        <div class="ct">✅ Geloof check vandaag</div>
-        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Bijbel gelezen</span></div>
-        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Gebed gedaan</span></div>
-        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Reflectievraag beantwoord</span></div>
-        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Kerk deze week</span></div>
-      </div>
-    </div>
-
-    <!-- METRICS -->
+    <!-- ══ METRICS ══════════════════════════════════════════ -->
     <div class="view" id="view-metrics">
-      <div class="vh"><div class="vh-tag">Voortgang — Data</div><div class="vh-title">Jouw <em>Metrics</em></div></div>
+      <div class="vh"><div class="vh-tag">Module 04</div><div class="vh-title">Me<em>trics</em></div></div>
+
+      <!-- Live metrics -->
       <div class="metrics">
-        <div class="metric gold" style="border-color:rgba(200,168,74,.25)">
+        <div class="metric">
           <div class="m-label">Gewicht</div>
-          <div><span class="m-val" id="mW" style="color:var(--gold)">95</span><span class="m-unit">kg</span></div>
-          <div class="pb"><div class="pb-row"><span>96 start</span><span id="mWpct">5%</span></div><div class="pbt"><div class="pbf gold" id="mWbar" style="width:5%"></div></div></div>
-          <div class="m-sub">Doel: 77 kg — nog <strong id="mWleft" style="color:var(--gold)">18 kg</strong></div>
+          <div><span class="m-val" id="mW">—</span><span class="m-unit">kg</span></div>
+          <div class="m-sub" id="mWleft">— kg naar doel</div>
+          <div class="pb"><div class="pb-row"><span>96kg</span><span id="mWpct">0%</span><span>77kg</span></div><div class="pbt"><div class="pbf gold" id="mWbar" style="width:0%"></div></div></div>
         </div>
-        <div class="metric" style="border-color:rgba(126,184,212,.2)">
+        <div class="metric">
+          <div class="m-label">Budget week</div>
+          <div><span style="font-size:10px;color:var(--dim)">€</span><span class="m-val" id="mB">80</span></div>
+          <div class="m-sub" id="mBsub">resterend</div>
+          <div class="pb"><div class="pb-row"><span>€0</span><span id="mBpct">100%</span><span>€80</span></div><div class="pbt"><div class="pbf sage" id="mBbar" style="width:100%"></div></div></div>
+        </div>
+        <div class="metric">
           <div class="m-label">Stappen</div>
-          <div><span class="m-val" id="mS" style="color:var(--ice)">0</span></div>
-          <div class="pb"><div class="pb-row"><span>doel</span><span id="mSpct">0%</span></div><div class="pbt"><div class="pbf ice" id="mSbar" style="width:0%"></div></div></div>
-          <div class="m-sub">van 10.000</div>
-        </div>
-        <div class="metric" style="border-color:rgba(111,207,151,.2)">
-          <div class="m-label">Budget</div>
-          <div><span class="m-val" id="mB" style="color:var(--sage)">80</span><span class="m-unit">€</span></div>
-          <div class="pb"><div class="pb-row"><span>resterend</span><span id="mBpct">100%</span></div><div class="pbt"><div class="pbf sage" id="mBbar" style="width:100%"></div></div></div>
-          <div class="m-sub">van €80 week</div>
+          <div><span class="m-val" id="mS">0</span></div>
+          <div class="m-sub">van 10.000 doel</div>
+          <div class="pb"><div class="pb-row"><span>0</span><span id="mSpct">0%</span><span>10k</span></div><div class="pbt"><div class="pbf ice" id="mSbar" style="width:0%"></div></div></div>
         </div>
         <div class="metric">
           <div class="m-label">BMI</div>
-          <div><span class="m-val" id="mBMI" style="color:var(--rose)">32.1</span></div>
-          <div class="m-sub" style="margin-top:12px">Doel: &lt;25</div>
+          <div><span class="m-val" id="mBMI">—</span></div>
+          <div class="m-sub">doel: &lt;25</div>
         </div>
       </div>
-      <div class="card">
-        <div class="ct">Invoeren</div>
-        <div class="fg"><label>Gewicht (kg)</label><input type="number" id="wInput" step="0.1" min="70" max="110" placeholder="95.0" oninput="updateW(this.value)"></div>
-        <div class="fg"><label>Stappen vandaag</label><input type="number" id="sInput" min="0" max="50000" placeholder="0" oninput="updateS(this.value)"></div>
-        <div class="fg"><label>Uitgaven (€)</label><input type="number" id="bInput" step="0.5" min="0" placeholder="0.00"></div>
-        <div class="fg"><label>Freelance leeruren vandaag</label><input type="number" id="freelanceHours" min="0" max="12" step="0.5" placeholder="0" onchange="saveFreelanceHours()"></div>
-        <div class="fg"><label>Slaap afgelopen nacht (uren)</label><input type="number" id="sleepHours" min="3" max="12" step="0.5" placeholder="7.5" onchange="saveSleepHours()"></div>
-        <div class="btn-row">
-          <button class="btn btn-ghost" onclick="spendB()">Aftrekken</button>
-          <button class="btn btn-gold" onclick="saveMetrics()">Opslaan</button>
-        </div>
-      </div>
-      <div class="card">
-        <div class="ct">📈 Wekelijkse stats</div>
+
+      <!-- Week stats -->
+      <div class="card inset">
+        <div class="ce">Week statistieken</div>
         <div class="sr"><span class="sr-l">Gewichtsverandering</span><span class="sr-r" id="weekWeightChange">—</span></div>
-        <div class="sr"><span class="sr-l">Freelance uren totaal</span><span class="sr-r" id="totalFreelanceHours">0 u</span></div>
+        <div class="sr"><span class="sr-l">Freelance uren</span><span class="sr-r" id="totalFreelanceHours">0u</span></div>
         <div class="sr"><span class="sr-l">Gem. slaap</span><span class="sr-r" id="avgSleep">—</span></div>
+        <div class="sr"><span class="sr-l">Streak score</span><span class="sr-r" id="weekStreakStat">—</span></div>
       </div>
+
+      <!-- Invoer -->
       <div class="card">
-        <div class="ct">🎯 Milestones</div>
-        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">90 kg bereikt</span><span class="ck-time">—</span></div>
-        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">85 kg bereikt</span><span class="ck-time">—</span></div>
-        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">80 kg bereikt</span><span class="ck-time">—</span></div>
-        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">77 kg 🎯</span><span class="ck-time">Doel</span></div>
-        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Eerste freelance euro</span><span class="ck-time">2026</span></div>
-        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">KVK geregistreerd</span><span class="ck-time">Jan 2027</span></div>
-        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">5km hardlopen pijnvrij</span><span class="ck-time">2026</span></div>
-        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">Schulden afgerond</span><span class="ck-time">Dec 2026</span></div>
+        <div class="ce">Vandaag invoeren</div>
+        <div class="fg"><label>Gewicht (kg)</label><input type="number" id="wInput" step="0.1" placeholder="95.0" onchange="updateW(this.value)"></div>
+        <div class="fg"><label>Stappen</label><input type="number" id="sInput" placeholder="0" onchange="updateS(this.value)"></div>
+        <div class="fg"><label>Slaap (uren)</label><input type="number" id="sleepHours" step="0.5" placeholder="7.5"></div>
+        <div class="fg"><label>Freelance leeruren vandaag</label><input type="number" id="freelanceHours" step="0.5" placeholder="2.0"></div>
+        <div class="fg"><label>Stemming</label>
+          <select id="stemmingSelect">
+            <option value="">Kies...</option>
+            <option value="🔥 Op fire">🔥 Op fire</option>
+            <option value="💪 Goed">💪 Goed</option>
+            <option value="😐 Neutraal">😐 Neutraal</option>
+            <option value="😔 Zwaar">😔 Zwaar</option>
+            <option value="🔴 Slecht">🔴 Slecht</option>
+          </select>
+        </div>
+        <button class="btn btn-gold" onclick="saveMetrics()">✓ Opslaan in Notion</button>
+      </div>
+
+      <!-- Budget uitgave -->
+      <div class="card">
+        <div class="ce">Budget bijhouden (€80/week)</div>
+
+        <!-- Budget ring -->
+        <div class="budget-ring">
+          <div class="ring-wrap">
+            <svg class="ring-svg" width="72" height="72" viewBox="0 0 72 72">
+              <circle cx="36" cy="36" r="28" fill="none" stroke="var(--line2)" stroke-width="4"/>
+              <circle cx="36" cy="36" r="28" fill="none" stroke="var(--sage)" stroke-width="4"
+                stroke-dasharray="175.9" id="budgetRing" stroke-dashoffset="0" stroke-linecap="round"/>
+            </svg>
+            <div class="ring-text"><div class="ring-val" id="ringVal">80</div><div class="ring-unit">EURO</div></div>
+          </div>
+          <div>
+            <div style="font-size:10px;color:var(--text);margin-bottom:4px;">Resterend budget</div>
+            <div style="font-size:9px;color:var(--dim);" id="budgetSpent">€0 uitgegeven</div>
+            <div style="font-size:9px;color:var(--dim);margin-top:2px;" id="budgetDays">— dagen tot maandag</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+          <div class="fg" style="margin:0"><label>Bedrag</label><input type="number" id="bInput" step="0.50" placeholder="0.00"></div>
+          <div class="fg" style="margin:0"><label>Categorie</label>
+            <select id="bCat">
+              <option value="🍎 Boodschappen">🍎 Boodschappen</option>
+              <option value="🍔 Eten buiten">🍔 Eten buiten</option>
+              <option value="🚌 Transport">🚌 Transport</option>
+              <option value="💊 Gezondheid">💊 Gezondheid</option>
+              <option value="🎁 Kinderen">🎁 Kinderen</option>
+              <option value="📱 Abonnementen">📱 Abonnementen</option>
+              <option value="⚠️ Overig">⚠️ Overig</option>
+            </select>
+          </div>
+        </div>
+        <div class="fg"><label>Omschrijving (optioneel)</label><input type="text" id="bOmschrijving" placeholder="bijv. Albert Heijn"></div>
+        <button class="btn btn-gold" onclick="spendB()">+ Uitgave registreren</button>
+
+        <!-- Recente uitgaven -->
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--line);">
+          <div class="ce">Recente uitgaven</div>
+          <div id="finLog"><div style="font-size:10px;color:var(--dim);text-align:center;padding:16px 0;">Nog geen uitgaven vandaag.</div></div>
+        </div>
       </div>
     </div>
 
-    <!-- REFLECTIE -->
-    <div class="view" id="view-reflectie">
-      <div class="vh"><div class="vh-tag">Avond — Verwerking</div><div class="vh-title">Dagelijkse <em>Reflectie</em></div></div>
+    <!-- ══ GELOOF ══════════════════════════════════════════ -->
+    <div class="view" id="view-geloof">
+      <div class="vh"><div class="vh-tag">Module 03</div><div class="vh-title">Ge<em>loof</em></div></div>
+      <div class="card gold">
+        <div class="ce">Vers van de dag</div>
+        <div class="bible-verse" id="bibleVerse">"..."</div>
+        <div class="bible-ref" id="bibleRef">—</div>
+        <div class="bible-question" id="bibleQuestion">→ Overweging</div>
+        <div class="ai-block faith" style="margin:12px 0 4px">
+          <div class="ai-body" style="font-family:'Fraunces',serif;font-size:13px;font-style:italic;color:var(--text);line-height:1.9" id="bibleQuestion2"></div>
+        </div>
+        <div class="fg" style="margin-top:12px;"><label>Jouw antwoord / reflectie</label><textarea id="bibleAnswer" rows="3" placeholder="Schrijf hier je gedachten..."></textarea></div>
+        <button class="btn btn-gold" onclick="saveBibleAnswer()">✓ Opslaan</button>
+      </div>
       <div class="card">
-        <div class="fg"><label>Wat ging goed vandaag?</label><textarea id="rG" rows="2" placeholder="Eerlijk schrijven..."></textarea></div>
-        <div class="fg"><label>Wat kon beter?</label><textarea id="rB" rows="2" placeholder="Wees open..."></textarea></div>
-        <div class="fg"><label>Wat leer ik hiervan?</label><textarea id="rL" rows="2" placeholder="Inzicht voor morgen..."></textarea></div>
-        <div class="fg"><label>Ik ben dankbaar voor</label><input type="text" id="rGr" placeholder="Vandaag dankbaar voor..."></div>
-        <div class="fg"><label>Stemming vandaag</label>
-          <select id="rMood">
+        <div class="ce">Gebed van vandaag</div>
+        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">☀️ Ochtendgebed gedaan</span></div>
+        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">📖 Bijbel gelezen</span></div>
+        <div class="ck" onclick="tc(this)"><div class="ck-box"></div><span class="ck-lbl">🌙 Avondgebed gedaan</span></div>
+      </div>
+      <div class="card inset">
+        <div class="ce">Maandthema</div>
+        <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:300;margin-bottom:6px;">Fundament leggen</div>
+        <div style="font-size:10px;color:var(--dim);line-height:1.7;">Maart 2026 — Discipline als daad van aanbidding. Elke ochtend is een keuze om God te vertrouwen met de dag die voor je ligt.</div>
+      </div>
+    </div>
+
+    <!-- ══ FREELANCE ═══════════════════════════════════════ -->
+    <div class="view" id="view-freelance">
+      <div class="vh"><div class="vh-tag">Module 07</div><div class="vh-title">Free<em>lance</em></div></div>
+
+      <!-- KPI dashboard -->
+      <div class="card gold">
+        <div class="ce">Week KPI — <span id="kpiWeekLabel">Week —</span></div>
+        <div class="stat-grid">
+          <div class="stat-cell">
+            <div class="stat-val" id="kpiUren">0</div>
+            <div class="stat-lbl">LEERUREN</div>
+          </div>
+          <div class="stat-cell">
+            <div class="stat-val" id="kpiPosts">0</div>
+            <div class="stat-lbl">LINKEDIN POSTS</div>
+          </div>
+          <div class="stat-cell">
+            <div class="stat-val" id="kpiGesprekken">0</div>
+            <div class="stat-lbl">KLANTGESPREKKEN</div>
+          </div>
+          <div class="stat-cell">
+            <div class="stat-val" id="kpiAutomations">0</div>
+            <div class="stat-lbl">AUTOMATIONS</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--line2);">
+          <span style="font-size:9px;color:var(--dim);">Op schema?</span>
+          <span id="kpiSchema" class="tag tag-amber">— invoeren</span>
+        </div>
+      </div>
+
+      <!-- KPI invoer -->
+      <div class="card inset">
+        <div class="ce">KPI invoeren</div>
+        <div class="kpi-input-row">
+          <div class="fg" style="margin:0"><label>Leeruren</label><input type="number" id="kpiUrenInput" step="0.5" placeholder="2.0"></div>
+          <div class="fg" style="margin:0"><label>LinkedIn posts</label><input type="number" id="kpiPostsInput" placeholder="0"></div>
+        </div>
+        <div class="kpi-input-row">
+          <div class="fg" style="margin:0"><label>Klantgesprekken</label><input type="number" id="kpiGesprekkenInput" placeholder="0"></div>
+          <div class="fg" style="margin:0"><label>Automations gebouwd</label><input type="number" id="kpiAutomationsInput" placeholder="0"></div>
+        </div>
+        <div class="fg"><label>Op schema?</label>
+          <select id="kpiOpSchemaInput">
             <option value="">Kies...</option>
-            <option value="😔 Zwaar">😔 Zwaar</option>
-            <option value="😐 Oké">😐 Oké</option>
-            <option value="🙂 Goed">🙂 Goed</option>
-            <option value="😊 Sterk">😊 Sterk</option>
-            <option value="🔥 On Fire">🔥 On Fire</option>
+            <option value="🔥 Voor op schema">🔥 Voor op schema</option>
+            <option value="✅ Op schema">✅ Op schema</option>
+            <option value="⚠️ Iets achter">⚠️ Iets achter</option>
+            <option value="🔴 Achter op schema">🔴 Achter op schema</option>
+          </select>
+        </div>
+        <button class="btn btn-gold" onclick="saveKPI()">✓ KPI opslaan in Notion</button>
+      </div>
+
+      <!-- Roadmap -->
+      <div class="card">
+        <div class="ce">Roadmap 2026</div>
+        <div class="sr"><span class="sr-l">Maart–April</span><span class="sr-r tag tag-amber">Make.com + n8n leren</span></div>
+        <div class="sr"><span class="sr-l">Mei</span><span class="sr-r tag tag-ice">Gratis project bij kennis</span></div>
+        <div class="sr"><span class="sr-l">Juni</span><span class="sr-r tag tag-ice">Case study + LinkedIn</span></div>
+        <div class="sr"><span class="sr-l">Juli–Augustus</span><span class="sr-r tag tag-ice">Eerste betalende klant</span></div>
+        <div class="sr"><span class="sr-l">Sept–Okt</span><span class="sr-r tag tag-ice">3-5 retainer klanten</span></div>
+        <div class="sr"><span class="sr-l">Nov–Dec</span><span class="sr-r tag tag-ice">KVK + €15k-20k/mnd</span></div>
+        <div class="sr"><span class="sr-l">Jan 2027</span><span class="sr-r tag tag-gold">Full time freelance 🔥</span></div>
+      </div>
+
+      <!-- Doel -->
+      <div class="card sage">
+        <div class="ce">Einddoel</div>
+        <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:300;margin-bottom:6px;">€15.000 <em>netto</em>/maand</div>
+        <div style="font-size:10px;color:var(--dim);">5 retainers × €1.500 + 2 setups × €12.500 = €25.000 bruto</div>
+      </div>
+    </div>
+
+    <!-- ══ REFLECTIE ═══════════════════════════════════════ -->
+    <div class="view" id="view-reflectie">
+      <div class="vh"><div class="vh-tag">Dagelijks</div><div class="vh-title">Refle<em>ctie</em></div></div>
+      <div class="card gold">
+        <div class="ce">Vandaag — <span id="refDate">—</span></div>
+        <div class="fg"><label>Wat ging goed?</label><textarea id="rG" rows="2" placeholder="Iets wat ik goed deed..."></textarea></div>
+        <div class="fg"><label>Wat was moeilijk?</label><textarea id="rB" rows="2" placeholder="Iets wat ik kon verbeteren..."></textarea></div>
+        <div class="fg"><label>Wat leerde ik?</label><textarea id="rL" rows="2" placeholder="Inzicht van vandaag..."></textarea></div>
+        <div class="fg"><label>Dankbaarheid</label><textarea id="rGr" rows="1" placeholder="Ik ben dankbaar voor..."></textarea></div>
+        <div class="fg"><label>Stemming</label>
+          <select id="rMood">
+            <option value="">Kies stemming...</option>
+            <option>🔥 On fire</option><option>💪 Sterk</option><option>😐 Neutraal</option>
+            <option>😔 Zwaar</option><option>🙏 Dankbaar</option><option>😤 Gefrustreerd</option>
           </select>
         </div>
         <div class="btn-row">
-          <button class="btn btn-ghost" onclick="clearRef()">Wissen</button>
-          <button class="btn btn-gold" onclick="saveRef()">Opslaan</button>
+          <button class="btn btn-gold" onclick="saveRef()">✓ Opslaan</button>
+          <button class="btn btn-ghost" onclick="clearRef()">Leegmaken</button>
         </div>
       </div>
-      <div class="ce" style="margin:14px 0 8px">Eerdere reflecties</div>
-      <div id="refLog"><div style="font-size:11px;color:var(--dim);text-align:center;padding:24px 0">Begin vandaag met reflecteren.</div></div>
+      <div class="card inset">
+        <div class="ce">Recente reflecties</div>
+        <div id="refLog"><div style="font-size:11px;color:var(--dim);text-align:center;padding:24px 0">Begin vandaag met reflecteren.</div></div>
+      </div>
     </div>
 
-    <!-- PROFIEL -->
+    <!-- ══ PROFIEL ═════════════════════════════════════════ -->
     <div class="view" id="view-profiel">
-      <div class="vh"><div class="vh-tag">Identiteit & Noord Ster</div><div class="vh-title"><em>Virgil</em> Rigters</div></div>
+      <div class="vh"><div class="vh-tag">Command Center</div><div class="vh-title">Vir<em>gil</em></div></div>
+
+      <!-- Noord Ster -->
       <div class="card gold">
-        <div class="sr"><span class="sr-l">Leeftijd</span><span class="sr-r">31 jaar</span></div>
-        <div class="sr"><span class="sr-l">Kinderen</span><span class="sr-r">Neyla (7) & Diego (5)</span></div>
-        <div class="sr"><span class="sr-l">Fase</span><span class="sr-r tag tag-gold">🏗️ Fundament</span></div>
-        <div class="sr"><span class="sr-l">Gewichtsdoel</span><span class="sr-r">96 → 77 kg</span></div>
-        <div class="sr"><span class="sr-l">Freelance doel</span><span class="sr-r">€15k/maand 2027</span></div>
-        <div class="sr"><span class="sr-l">Relatiefase</span><span class="sr-r tag tag-rose">🔴 Herstel</span></div>
+        <div class="ce">Noord Ster</div>
+        <div style="font-family:'Fraunces',serif;font-size:15px;font-weight:300;line-height:1.7;color:var(--text);">Een gedisciplineerde, spiritueel stabiele, fysiek sterke, financieel vrije man. Een vader die zijn kinderen laat zien wie God is.</div>
       </div>
-      <div class="card inset">
-        <div class="ct">🧭 Noord Ster</div>
-        <div class="ai-block advice">
-          <div class="ai-body" style="line-height:1.9">
-            <strong>Lichaam:</strong> 77 kg, pijnvrij hardlopen<br>
-            <strong>Geloof:</strong> Dagelijks met God, kerk, Bijbel<br>
-            <strong>Vader:</strong> Aanwezig, consistent, liefdevolle leider<br>
-            <strong>Freelance:</strong> €15k netto/maand in 2027<br>
-            <strong>Financiën:</strong> €100k vermogen, schuldenvrij<br>
-            <strong>Relatie:</strong> Een vrouw die past bij de man die ik word
+
+      <!-- Live stats -->
+      <div class="card">
+        <div class="ce">Status — Live</div>
+        <div class="stat-grid">
+          <div class="stat-cell">
+            <div class="stat-val" id="profGewicht">—</div>
+            <div class="stat-lbl">KG NU</div>
+          </div>
+          <div class="stat-cell">
+            <div class="stat-val" id="profStreak">—</div>
+            <div class="stat-lbl">STREAK /7</div>
+          </div>
+          <div class="stat-cell">
+            <div class="stat-val" id="profBudget">—</div>
+            <div class="stat-lbl">BUDGET €</div>
+          </div>
+          <div class="stat-cell">
+            <div class="stat-val" id="profUren">—</div>
+            <div class="stat-lbl">FL UREN/WK</div>
           </div>
         </div>
       </div>
-      <div class="card rose">
-        <div class="ct">❤️ Relatiefase</div>
-        <div class="rel-fase">
-          <div class="rel-fase-item active"><div class="rel-fase-icon">🔴</div><div>Herstel</div></div>
-          <div class="rel-fase-item"><div class="rel-fase-icon">🟡</div><div>Herbouw</div></div>
-          <div class="rel-fase-item"><div class="rel-fase-icon">🟢</div><div>Gereed</div></div>
-          <div class="rel-fase-item"><div class="rel-fase-icon">💍</div><div>Partner</div></div>
-        </div>
-        <div class="ai-block warn" style="margin-top:4px;margin-bottom:0">
-          <div class="ai-title" style="color:var(--rose)">Nu: Herstel fase</div>
-          <div class="ai-body">Focus op jezelf. Geen contact vanuit pijn. <strong>Laat God het leiden.</strong></div>
-        </div>
-      </div>
-      <div class="card sage">
-        <div class="ct">🚀 Freelance Voortgang</div>
-        <div class="sr"><span class="sr-l">Fase</span><span class="sr-r tag tag-gold">Leren</span></div>
-        <div class="sr"><span class="sr-l">Tool</span><span class="sr-r">Make.com starten</span></div>
-        <div class="sr"><span class="sr-l">Eerste klant</span><span class="sr-r tag tag-ice">Juni 2026</span></div>
-        <div class="pb" style="margin-top:10px">
-          <div class="pb-row"><span>Roadmap voortgang 2026</span><span>10%</span></div>
-          <div class="pbt"><div class="pbf sage" style="width:10%"></div></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="ct">Notion status</div>
-        <div id="notionStatus" class="loading"><div class="spin"></div>Verbinding testen...</div>
-      </div>
+
+      <!-- 3 Prioriteiten -->
       <div class="card inset">
-        <div style="font-family:'Fraunces',serif;font-size:20px;font-weight:300;line-height:1.4;text-align:center;padding:8px 0">
-          "Niet perfectie.<br><em style="color:var(--gold)">Consistentie."</em>
-        </div>
+        <div class="ce">Jouw 3 — Q1 2026</div>
+        <div class="sr"><span class="sr-l">✝️ Geloof</span><span class="sr-r tag tag-gold">Dagelijks fundament</span></div>
+        <div class="sr"><span class="sr-l">💪 Lichaam</span><span class="sr-r tag tag-gold">77 kg · pijnvrij</span></div>
+        <div class="sr"><span class="sr-l">🚀 Freelance</span><span class="sr-r tag tag-gold">Eerste klant sept</span></div>
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--line2);font-size:9px;color:var(--dim);">Alles buiten deze 3 is bonus. Niet prioriteit.</div>
+      </div>
+
+      <!-- Vader -->
+      <div class="card sage">
+        <div class="ce">Vader</div>
+        <div class="sr"><span class="sr-l">Neyla</span><span class="sr-r">7 jaar</span></div>
+        <div class="sr"><span class="sr-l">Diego</span><span class="sr-r">5 jaar 🎂</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--dim);line-height:1.7;">Over 20 jaar zeggen zij: "Mijn vader was er. Hij luisterde. Hij liet zien dat een man zijn woord houdt."</div>
+      </div>
+
+      <!-- Relatie fase -->
+      <div class="card rose">
+        <div class="ce">Relatie</div>
+        <div class="phase-badge">🔴 Herstel fase</div>
+        <div style="font-size:10px;color:var(--dim);line-height:1.7;margin-top:6px;">Focus op jezelf. Geen contact vanuit pijn. Laat God het leiden. De juiste vrouw wacht op de man die jij aan het worden bent.</div>
+      </div>
+
+      <!-- Schuldsanering countdown -->
+      <div class="card">
+        <div class="ce">Financiële vrijheid</div>
+        <div class="sr"><span class="sr-l">Schuldsanering eindigt</span><span class="sr-r tag tag-amber">December 2026</span></div>
+        <div class="sr"><span class="sr-l">Dagen te gaan</span><span class="sr-r" id="dagenTotVrijheid">— dagen</span></div>
+        <div class="sr"><span class="sr-l">Leefgeld/week</span><span class="sr-r">€80</span></div>
+      </div>
+
+      <!-- Notion status -->
+      <div class="card inset">
+        <div class="ce">Systeem status</div>
+        <div id="notionStatus" class="loading"><div class="spin"></div>Verbinding testen...</div>
       </div>
     </div>
 
-  </div>
+  </div><!-- /content -->
+
   <nav class="nav">
-    <div class="nav-item active" onclick="goTo('vandaag',this)"><div class="nav-icon">⚡</div><div class="nav-label">VANDAAG</div><div class="nav-dot"></div></div>
+    <div class="nav-item active" onclick="goTo('vandaag',this)"><div class="nav-icon">⚡</div><div class="nav-label">VANDAAG</div></div>
     <div class="nav-item" onclick="goTo('training',this)"><div class="nav-icon">💪</div><div class="nav-label">TRAINING</div></div>
-    <div class="nav-item" onclick="goTo('geloof',this)"><div class="nav-icon">✝️</div><div class="nav-label">GELOOF</div></div>
     <div class="nav-item" onclick="goTo('metrics',this)"><div class="nav-icon">◈</div><div class="nav-label">METRICS</div></div>
+    <div class="nav-item" onclick="goTo('geloof',this)"><div class="nav-icon">✝️</div><div class="nav-label">GELOOF</div></div>
+    <div class="nav-item" onclick="goTo('freelance',this)"><div class="nav-icon">🚀</div><div class="nav-label">FREELANCE</div></div>
     <div class="nav-item" onclick="goTo('reflectie',this)"><div class="nav-icon">🪞</div><div class="nav-label">REFLECTIE</div></div>
     <div class="nav-item" onclick="goTo('profiel',this)"><div class="nav-icon">◎</div><div class="nav-label">PROFIEL</div></div>
   </nav>
 </div>
 <div class="toast" id="toast"></div>
+
 <script>
 const API = '/.netlify/functions/notion';
+
+// ─── STATE ───────────────────────────────────────────────
 const S = {
   energy: null, cap: 0,
   weight: parseFloat(localStorage.getItem('w') || '95'),
   steps: parseInt(localStorage.getItem('s') || '0'),
   budget: parseFloat(localStorage.getItem('b') || '80'),
+  budgetSpent: parseFloat(localStorage.getItem('bSpent') || '0'),
   refs: JSON.parse(localStorage.getItem('refs') || '[]'),
+  expenses: JSON.parse(localStorage.getItem('expenses') || '[]'),
   dagId: null, workouts: [], syncOk: false,
-  bibleDay: parseInt(localStorage.getItem('bibleDay') || '1')
+  bibleDay: parseInt(localStorage.getItem('bibleDay') || '1'),
+  streakData: JSON.parse(localStorage.getItem('streakData') || '{}'),
+  kpi: JSON.parse(localStorage.getItem('kpiWeek') || '{}'),
+  aiLoaded: false,
 };
+
 const BIBLE = [
-  {vers:"Ik loof U omdat ik op wonderbaarlijke wijze gemaakt ben.",ref:"Psalm 139:14",vraag:"Wat vind ik moeilijk om te accepteren aan mezelf? Wat zou God tegen mij zeggen?"},
+  {vers:"Ik loof U omdat ik op wonderbaarlijke wijze gemaakt ben.",ref:"Psalm 139:14",vraag:"Wat vind ik moeilijk te accepteren aan mezelf? Wat zou God tegen mij zeggen?"},
   {vers:"Er is nu geen veroordeling voor hen die in Christus Jezus zijn.",ref:"Romeinen 8:1",vraag:"Waar veroordeel ik mezelf nog voor? Schrijf het op — en laat het dan los."},
-  {vers:"Iemand die één met Christus is, is een nieuwe schepping.",ref:"2 Korintiërs 5:17",vraag:"Welk deel van de 'oude Virgil' laat ik bewust achter? Wat hoort bij de nieuwe man?"},
+  {vers:"Iemand die één met Christus is, is een nieuwe schepping.",ref:"2 Korintiërs 5:17",vraag:"Welk deel van de 'oude Virgil' laat ik bewust achter?"},
   {vers:"Wees niet bang, want Ik heb je verlost. Je bent van Mij.",ref:"Jesaja 43:1",vraag:"Op welk moment voelde ik me het meest de man die ik wil zijn?"},
   {vers:"Ik ben voor alles bestand door Hem die mij kracht geeft.",ref:"Filippenzen 4:13",vraag:"Wat is het grootste obstakel dat ik dit jaar moet overwinnen?"},
   {vers:"Laten we niet moe worden goed te doen — op de juiste tijd oogsten we.",ref:"Galaten 6:9",vraag:"Waar wil ik op opgeven? Wat zou ik verliezen als ik dat deed?"},
   {vers:"Wees vastberaden en moedig. God is met je.",ref:"Jozua 1:9",vraag:"Wat is er veranderd in hoe ik over mezelf denk deze week?"},
   {vers:"Kinderen zijn een geschenk van God.",ref:"Psalm 127:3",vraag:"Wat wil ik dat Neyla en Diego over 20 jaar over hun vader zeggen?"},
-  {vers:"Waak over uw hart, want daaruit ontspringt het leven.",ref:"Spreuken 4:23",vraag:"Wat bescherm ik mijn hart voor? Waar laat ik dingen toe die er niet in horen?"},
+  {vers:"Waak over uw hart, want daaruit ontspringt het leven.",ref:"Spreuken 4:23",vraag:"Wat bescherm ik mijn hart voor?"},
   {vers:"Kom naar Mij toe — Ik zal jullie rust geven.",ref:"Matteüs 11:28",vraag:"Welke last draag ik die ik niet alleen hoef te dragen?"},
-  {vers:"Vertrouw op de HEER met heel je hart.",ref:"Spreuken 3:5",vraag:"Waar vertrouw ik nog te veel op mijn eigen plan in plaats van God?"},
-  {vers:"Liefde is geduldig en vol goedheid. Ze is niet jaloers.",ref:"1 Korintiërs 13:4",vraag:"Hoe geef ik liefde — vanuit kracht of vanuit behoefte?"},
+  {vers:"Vertrouw op de HEER met heel je hart.",ref:"Spreuken 3:5",vraag:"Waar vertrouw ik nog te veel op mijn eigen plan?"},
+  {vers:"Liefde is geduldig en vol goedheid.",ref:"1 Korintiërs 13:4",vraag:"Geef ik liefde vanuit kracht of vanuit behoefte?"},
   {vers:"Wacht op de HEER, wees sterk, houd moed.",ref:"Psalm 27:14",vraag:"Waar vraagt God mij nu geduld te hebben?"},
-  {vers:"Geef alles aan God bekend. Zijn vrede zal uw hart bewaken.",ref:"Filippenzen 4:6-7",vraag:"Waar maak ik me de meeste zorgen om? Heb ik dit eerlijk aan God gegeven?"},
+  {vers:"Geef alles aan God bekend. Zijn vrede zal uw hart bewaken.",ref:"Filippenzen 4:6-7",vraag:"Waar maak ik me de meeste zorgen om?"},
 ];
+
+// ─── API ─────────────────────────────────────────────────
 async function apiCall(method, endpoint, body) {
   try {
     const opts = { method, headers: { 'Content-Type': 'application/json' } };
@@ -460,12 +638,164 @@ async function apiCall(method, endpoint, body) {
     return await r.json();
   } catch(e) { return null; }
 }
+
+// ─── INIT ────────────────────────────────────────────────
 async function init() {
   updateClock(); setInterval(updateClock, 1000);
   setHeroDate(); setGreeting();
-  loadMetricsDisplay(); loadRefs(); loadChecks(); loadBibleVerse();
-  await loadDag(); await loadWorkouts();
+  loadMetricsDisplay(); loadRefs(); loadChecks();
+  loadBibleVerse(); loadExpenses(); loadKPIDisplay();
+  renderStreakBar(); updateProfileStats();
+  calcDagenTotVrijheid();
+  loadAI(); // Start AI load early
+  await loadDag();
+  await loadWorkouts();
 }
+
+// ─── AI INTELLIGENCE ─────────────────────────────────────
+async function loadAI() {
+  const streakScore = calcStreakScore();
+  const recentRef = S.refs.length > 0 ? S.refs[0].g || S.refs[0].b : null;
+  const wHistory = JSON.parse(localStorage.getItem('wHistory') || '[]');
+  let gewichtTrend = null;
+  if (wHistory.length >= 2) {
+    gewichtTrend = (wHistory[wHistory.length-1].w - wHistory[Math.max(0, wHistory.length-7)].w).toFixed(1);
+  }
+  const today = new Date().toISOString().split('T')[0];
+  const freelanceToday = parseFloat(localStorage.getItem('freelanceHours_' + today) || '0');
+  let totalFL = 0;
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    totalFL += parseFloat(localStorage.getItem('freelanceHours_' + d.toISOString().split('T')[0]) || '0');
+  }
+
+  const payload = {
+    energie: S.cap || 60,
+    energieLabel: S.energy || 'Normaal',
+    gewicht: S.weight,
+    budgetResterend: S.budget,
+    streakScore,
+    freelanceUrenWeek: totalFL.toFixed(1),
+    slaap: localStorage.getItem('sleepHours_' + today) || null,
+    reflectie: recentRef,
+    gewichtTrend,
+  };
+
+  const data = await apiCall('POST', '/ai', payload);
+  if (data && data.advies) {
+    renderAIAdvies(data.advies);
+  } else {
+    renderAIAdvies(getFallbackAdvies());
+  }
+}
+
+function renderAIAdvies(a) {
+  const tc = {go:'var(--sage)',warn:'var(--rose)',wait:'var(--amber)',advice:'var(--ice)',faith:'var(--purple)'};
+  const aiLabel = `<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;font-size:8px;color:var(--dim);letter-spacing:2px;">
+    <span>AI COACH</span><span style="background:var(--gold-g);color:var(--gold);padding:2px 6px;border-radius:10px;font-size:7px;">CLAUDE</span>
+  </div>`;
+  document.getElementById('aiAdviesWrap').innerHTML =
+    `<div class="ai-block ${a.type}" style="margin-bottom:12px">
+      ${aiLabel}
+      <div class="ai-title" style="color:${tc[a.type]||'var(--ice)'}">${a.title}</div>
+      <div class="ai-body">${a.body}</div>
+    </div>`;
+  S.aiLoaded = true;
+}
+
+function getFallbackAdvies() {
+  const h = new Date().getHours();
+  if (h < 9) return {type:'faith',title:'🌅 Goedemorgen',body:'Begin met God vandaag. Gebed voor je telefoon. Stilte voor de wereld. Jij hebt de keuze hoe deze dag begint.'};
+  if (h < 12) return {type:'go',title:'⚡ Ochtend momentum',body:'De ochtend bepaalt de dag. Jij hebt je routine — gebruik hem. Elke dag is een kans om de man te worden die je wil zijn.'};
+  if (h > 20) return {type:'advice',title:'🌙 Afsluiten',body:'Eindig bewust. Reflectie schrijven, gebed, vroeg slapen. Morgen begint vanavond.'};
+  return {type:'advice',title:'📍 Stay focused',body:'Top 3: geloof, lichaam, freelance. Alles buiten die 3 is bonus. Wat doe jij nu dat telt?'};
+}
+
+// Refresh AI als energie ingesteld wordt
+async function refreshAIWithEnergy() {
+  if (!S.aiLoaded) return;
+  document.getElementById('aiAdviesWrap').innerHTML = '<div class="ai-loading"><div class="spin"></div><span>AI herlaadt advies...</span></div>';
+  await loadAI();
+}
+
+// ─── STREAK ──────────────────────────────────────────────
+function calcStreakScore() {
+  let score = 0;
+  const days = ['zo','ma','di','wo','do','vr','za'];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const key = d.toISOString().split('T')[0];
+    const status = S.streakData[key];
+    if (status === '✅ Alles') score++;
+    else if (status === '⚠️ Deels') score += 0.5;
+  }
+  return Math.round(score * 10) / 10;
+}
+
+function renderStreakBar() {
+  const days = ['Zo','Ma','Di','Wo','Do','Vr','Za'];
+  const bar = document.getElementById('streakBar');
+  let html = '';
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const key = d.toISOString().split('T')[0];
+    const status = S.streakData[key];
+    const dayLabel = days[d.getDay()];
+    let cls = '';
+    let icon = '—';
+    if (status === '✅ Alles') { cls = 'done'; icon = '✓'; }
+    else if (status === '⚠️ Deels') { cls = 'partial'; icon = '~'; }
+    else if (i < new Date().getDay() || i === 0) { cls = ''; icon = '·'; }
+    html += `<div class="streak-day ${cls}"><span>${icon}</span><span>${dayLabel}</span></div>`;
+  }
+  bar.innerHTML = html;
+
+  const score = calcStreakScore();
+  document.getElementById('streakScore').textContent = score;
+  document.getElementById('weekStreakStat').textContent = score + '/7';
+  const labels = ['Begin vandaag.', 'Moeilijke week. Morgen opnieuw.', 'Wisselvallig — wat blokkeert je?', 'Solide basis.', 'Goed bezig, houd vast.', 'Sterke week!', 'Goggins week — on fire! 🔥', 'PERFECT WEEK 🏆'];
+  document.getElementById('streakLabel').textContent = labels[Math.min(Math.floor(score), 7)];
+  document.getElementById('profStreak').textContent = score;
+}
+
+function saveDagMinimum() {
+  const checks = Array.from(document.querySelectorAll('#ck0,#ck1,#ck2,#ck3,#ck4'));
+  const done = checks.filter(c => c.classList.contains('done')).length;
+  const today = new Date().toISOString().split('T')[0];
+  let status;
+  if (done === 5) status = '✅ Alles';
+  else if (done >= 3) status = '⚠️ Deels';
+  else status = '❌ Niet';
+  S.streakData[today] = status;
+  localStorage.setItem('streakData', JSON.stringify(S.streakData));
+  renderStreakBar();
+  // Sync to Notion metrics
+  apiCall('POST', '/metrics', {
+    dagelijksMinimum: status,
+    gewicht: S.weight,
+    stappen: S.steps,
+    energie: Math.round(S.cap / 10),
+    freelanceUren: localStorage.getItem('freelanceHours_' + today) || 0,
+  });
+  showToast(status === '✅ Alles' ? '🔥 Dag volledig afgerond!' : `✓ Dag afgesloten — ${done}/5`);
+}
+
+// ─── ENERGIE ─────────────────────────────────────────────
+async function setEnergy(el, cap, lbl) {
+  document.querySelectorAll('.en-opt').forEach(e => e.classList.remove('sel'));
+  el.classList.add('sel'); S.energy = lbl; S.cap = cap;
+  document.getElementById('capVal').textContent = cap + '%';
+  document.getElementById('capFill').style.width = cap + '%';
+  if (S.dagId) {
+    const intMap = {20:'Rust',40:'Licht',60:'Normaal',80:'Zwaar',100:'Maximaal'};
+    await apiCall('PATCH', '/dagen/' + S.dagId, {properties:{'Intensiteit toegestaan':{select:{name:intMap[cap]||'Normaal'}}}});
+  }
+  renderWorkouts();
+  showToast('✓ Energie ingesteld');
+  setTimeout(refreshAIWithEnergy, 100);
+}
+
+// ─── BIBLE ───────────────────────────────────────────────
 function loadBibleVerse() {
   const today = new Date().toDateString();
   const lastDate = localStorage.getItem('bibleDate');
@@ -478,20 +808,26 @@ function loadBibleVerse() {
   document.getElementById('bibleVerse').textContent = '"' + b.vers + '"';
   document.getElementById('bibleRef').textContent = b.ref;
   document.getElementById('bibleQuestion').textContent = '→ ' + b.vraag;
+  document.getElementById('bibleQuestion2').textContent = b.vraag;
   const saved = localStorage.getItem('bibleAnswer_' + today);
   if (saved) document.getElementById('bibleAnswer').value = saved;
 }
+
 function saveBibleAnswer() {
   const val = document.getElementById('bibleAnswer').value.trim();
   if (!val) return;
   localStorage.setItem('bibleAnswer_' + new Date().toDateString(), val);
   showToast('✓ Antwoord opgeslagen');
 }
+
+// ─── GREET ───────────────────────────────────────────────
 function setGreeting() {
   const h = new Date().getHours();
   const g = h < 12 ? 'Goedemorgen' : h < 17 ? 'Goedemiddag' : 'Goedenavond';
   document.getElementById('heroGreet').innerHTML = g + ', <em>Virgil.</em>';
 }
+
+// ─── NOTION SYNC ─────────────────────────────────────────
 async function loadDag() {
   setSyncStatus('loading', 'SYNCING...');
   const data = await apiCall('GET', '/dagen');
@@ -499,200 +835,358 @@ async function loadDag() {
     S.syncOk = true;
     if (data.results.length > 0) { S.dagId = data.results[0].id; setSyncStatus('ok', 'NOTION ✓'); }
     else {
-      const nieuw = await apiCall('POST', '/dagen', { dag_type: 'Werkdag licht', intensiteit: 'Normaal' });
+      const nieuw = await apiCall('POST', '/dagen', {dag_type:'Werkdag licht',intensiteit:'Normaal'});
       if (nieuw && nieuw.id) { S.dagId = nieuw.id; setSyncStatus('ok', 'NOTION ✓'); }
     }
   } else { setSyncStatus('err', 'OFFLINE'); document.getElementById('heroSub').textContent = 'Offline modus actief'; }
   updateNotionCard();
 }
+
 async function loadWorkouts() {
   const data = await apiCall('GET', '/workouts');
-  const loadingEl = document.getElementById('trainingLoading');
   if (!data || !data.results) {
-    loadingEl.innerHTML = '<div style="font-size:11px;color:var(--rose);text-align:center;padding:24px 0">Kon workouts niet laden. Controleer Notion verbinding.</div>';
+    document.getElementById('trainingLoading').innerHTML = '<div style="font-size:11px;color:var(--rose);text-align:center;padding:24px 0">Kon workouts niet laden.</div>';
     return;
   }
   S.workouts = data.results.map(p => {
-    const props = p.properties;
-    return { id: p.id, naam: props['Naam']?.title?.[0]?.plain_text || 'Naamloos', type: props['Type']?.select?.name || 'Fundament', focus: props['Focus']?.multi_select?.map(f=>f.name).join(', ') || '—', belasting: props['Benodigde capaciteit']?.number || 0, duur: props['Duur (min)']?.number || 0, gedaan: props['Gedaan']?.checkbox || false };
+    const pr = p.properties;
+    return { id:p.id, naam:pr['Naam']?.title?.[0]?.plain_text||'Naamloos', type:pr['Type']?.select?.name||'Fundament', focus:pr['Focus']?.multi_select?.map(f=>f.name).join(', ')||'—', belasting:pr['Benodigde capaciteit']?.number||0, duur:pr['Duur (min)']?.number||0, gedaan:pr['Gedaan']?.checkbox||false };
   });
   renderWorkouts();
 }
+
 function renderWorkouts() {
   document.getElementById('trainingLoading').style.display = 'none';
-  document.getElementById('trainingContent').style.display = 'block';
-  const icons = {'Fundament':'🧘','Normaal':'💪','Herstel':'🚶','Zwaar':'🔥'};
-  const colors = {'Fundament':'var(--ice)','Normaal':'var(--gold)','Herstel':'var(--sage)','Zwaar':'var(--rose)'};
-  const aanbevolen = S.workouts.filter(w => !w.gedaan).sort((a,b) => S.cap >= 80 ? b.belasting-a.belasting : a.belasting-b.belasting)[0];
+  document.getElementById('woList').style.display = 'block';
+  const icons = {Fundament:'🧘',Normaal:'💪',Herstel:'🚶',Zwaar:'🔥'};
+  const colors = {Fundament:'var(--ice)',Normaal:'var(--gold)',Herstel:'var(--sage)',Zwaar:'var(--rose)'};
+  const aanbevolen = S.workouts.filter(w=>!w.gedaan).sort((a,b)=>S.cap>=80?b.belasting-a.belasting:a.belasting-b.belasting)[0];
   const gb = document.getElementById('gekozenBlock');
   if (aanbevolen) {
     gb.innerHTML = `<div class="card gold"><div class="ce">Aanbevolen vandaag</div><div style="display:flex;align-items:center;gap:12px;margin-bottom:10px"><div style="width:44px;height:44px;border-radius:12px;background:var(--s4);display:flex;align-items:center;justify-content:center;font-size:20px">${icons[aanbevolen.type]||'💪'}</div><div><div style="font-size:13px;font-weight:500;margin-bottom:2px">${aanbevolen.naam}</div><div style="font-size:10px;color:var(--dim)">${aanbevolen.focus} · ${aanbevolen.duur||'—'} min</div></div></div><button class="btn btn-gold" onclick="markGedaan('${aanbevolen.id}')">✓ Training voltooid</button></div>`;
   } else {
-    gb.innerHTML = `<div class="ai-block go"><div class="ai-title" style="color:var(--sage)">Alle workouts gedaan 🎉</div><div class="ai-body"><strong>Geweldig.</strong> Rust en herstel.</div></div>`;
+    gb.innerHTML = `<div class="ai-block go"><div class="ai-title" style="color:var(--sage)">Alle workouts gedaan 🎉</div><div class="ai-body"><strong>Geweldig.</strong> Rust en herstel vandaag.</div></div>`;
   }
-  document.getElementById('woList').innerHTML = S.workouts.map(w => {
-    const pct = (w.belasting/10)*100; const c = colors[w.type]||'var(--gold)';
+  document.getElementById('woList').innerHTML = S.workouts.map(w=>{
+    const pct=(w.belasting/10)*100; const c=colors[w.type]||'var(--gold)';
     return `<div class="wo ${w.gedaan?'disabled':''}"><div class="wo-ico">${icons[w.type]||'💪'}</div><div class="wo-body"><div class="wo-name">${w.naam}</div><div class="wo-meta">${w.focus} · ${w.duur||'—'} min</div></div><div class="wo-load"><div class="wl-bar"><div class="wl-fill" style="width:${pct}%;background:${c}"></div></div><div class="wl-val">${w.belasting}/10</div></div><div class="wo-check ${w.gedaan?'done':''}" onclick="markGedaan('${w.id}')"></div></div>`;
   }).join('');
 }
+
 async function markGedaan(id) {
   showToast('Opslaan...');
-  const result = await apiCall('PATCH', '/workouts/' + id, { properties: { 'Gedaan': { checkbox: true } } });
-  if (result && result.id) { const wo = S.workouts.find(w => w.id === id); if (wo) wo.gedaan = true; renderWorkouts(); showToast('✓ Opgeslagen in Notion'); }
-  else { showToast('⚠️ Opslaan mislukt'); }
+  const result = await apiCall('PATCH', '/workouts/' + id, {properties:{'Gedaan':{checkbox:true}}});
+  if (result && result.id) { const wo=S.workouts.find(w=>w.id===id); if(wo) wo.gedaan=true; renderWorkouts(); showToast('✓ Opgeslagen in Notion'); }
+  else showToast('⚠️ Opslaan mislukt');
 }
-async function setEnergy(el, cap, lbl) {
-  document.querySelectorAll('.en-opt').forEach(e => e.classList.remove('sel'));
-  el.classList.add('sel'); S.energy = lbl; S.cap = cap;
-  document.getElementById('capVal').textContent = cap + '%';
-  document.getElementById('capFill').style.width = cap + '%';
-  if (S.dagId) {
-    const intMap = {20:'Rust',40:'Licht',60:'Normaal',80:'Zwaar',100:'Maximaal'};
-    await apiCall('PATCH', '/dagen/' + S.dagId, { properties: { 'Intensiteit toegestaan': { select: { name: intMap[cap]||'Normaal' } } } });
-  }
-  const advice = {20:{t:'warn',title:'🔴 Hersteldag',body:'Energie kritiek. <strong>Geen training.</strong> Gebed, stilte, wandeling.'},40:{t:'wait',title:'🟠 Licht protocol',body:'Energie laag. Kies <strong>fundamentals</strong> of wandeling.'},60:{t:'advice',title:'🟡 Normaal protocol',body:'Energie normaal. Volg je <strong>standaard routine</strong>.'},80:{t:'go',title:'🟢 Kracht dag',body:'Energie goed. <strong>Gym vandaag.</strong>'},100:{t:'go',title:'⚡ Maximum output',body:'On fire. <strong>Dit is jouw dag.</strong>'}};
-  const a = advice[cap]; const tc = {go:'var(--sage)',warn:'var(--rose)',wait:'var(--amber)',advice:'var(--ice)'};
-  document.getElementById('aiAdvies').innerHTML = `<div class="ai-block ${a.t}" style="margin-bottom:12px"><div class="ai-title" style="color:${tc[a.t]}">${a.title}</div><div class="ai-body">${a.body}</div></div>`;
-  renderWorkouts(); showToast('✓ Energie ingesteld');
-}
-function tc(el) { el.classList.toggle('done'); saveChecks(); }
-function saveChecks() {
-  const checks = []; document.querySelectorAll('.ck').forEach(ck => checks.push(ck.classList.contains('done')));
-  localStorage.setItem('checks_' + new Date().toISOString().split('T')[0], JSON.stringify(checks));
-}
-function loadChecks() {
-  const saved = JSON.parse(localStorage.getItem('checks_' + new Date().toISOString().split('T')[0]) || '[]');
-  document.querySelectorAll('.ck').forEach((ck, i) => { if (saved[i]) ck.classList.add('done'); });
-}
+
+// ─── METRICS ─────────────────────────────────────────────
 function updateW(v) {
-  if (!v) return; const w = parseFloat(v); S.weight = w;
-  const pct = Math.max(0, Math.min(100, ((96-w)/19)*100));
-  document.getElementById('mW').textContent = w.toFixed(1);
-  document.getElementById('mWbar').style.width = Math.round(pct) + '%';
-  document.getElementById('mWpct').textContent = Math.round(pct) + '%';
-  document.getElementById('mWleft').textContent = Math.max(0, w-77).toFixed(1) + ' kg';
-  const bmi = (w/(1.72*1.72)).toFixed(1); const bmiEl = document.getElementById('mBMI');
-  bmiEl.textContent = bmi; bmiEl.style.color = parseFloat(bmi)<25?'var(--sage)':parseFloat(bmi)<30?'var(--amber)':'var(--rose)';
+  if (!v) return; const w=parseFloat(v); S.weight=w;
+  const pct=Math.max(0,Math.min(100,((96-w)/19)*100));
+  document.getElementById('mW').textContent=w.toFixed(1);
+  document.getElementById('mWbar').style.width=Math.round(pct)+'%';
+  document.getElementById('mWpct').textContent=Math.round(pct)+'%';
+  document.getElementById('mWleft').textContent=Math.max(0,w-77).toFixed(1)+' kg naar doel';
+  const bmi=(w/(1.72*1.72)).toFixed(1);
+  const bmiEl=document.getElementById('mBMI'); bmiEl.textContent=bmi;
+  bmiEl.style.color=parseFloat(bmi)<25?'var(--sage)':parseFloat(bmi)<30?'var(--amber)':'var(--rose)';
+  document.getElementById('profGewicht').textContent=w.toFixed(1);
 }
+
 function updateS(v) {
-  const s = parseInt(v)||0; S.steps = s; const pct = Math.min(100,(s/10000)*100);
-  document.getElementById('mS').textContent = s.toLocaleString('nl-NL');
-  document.getElementById('mSbar').style.width = pct + '%';
-  document.getElementById('mSpct').textContent = Math.round(pct) + '%';
+  const s=parseInt(v)||0; S.steps=s; const pct=Math.min(100,(s/10000)*100);
+  document.getElementById('mS').textContent=s.toLocaleString('nl-NL');
+  document.getElementById('mSbar').style.width=pct+'%';
+  document.getElementById('mSpct').textContent=Math.round(pct)+'%';
 }
-function spendB() {
-  const a = parseFloat(document.getElementById('bInput').value)||0;
-  S.budget = Math.max(0, S.budget - a); const pct = (S.budget/80)*100;
-  document.getElementById('mB').textContent = S.budget.toFixed(2);
-  document.getElementById('mBbar').style.width = pct + '%';
-  document.getElementById('mBpct').textContent = Math.round(pct) + '%';
-  document.getElementById('bInput').value = '';
+
+function updateBudgetDisplay() {
+  const pct=(S.budget/80)*100;
+  document.getElementById('mB').textContent=S.budget.toFixed(2);
+  document.getElementById('mBbar').style.width=pct+'%';
+  document.getElementById('mBpct').textContent=Math.round(pct)+'%';
+  document.getElementById('mBsub').textContent='resterend van €80';
+  document.getElementById('profBudget').textContent='€'+S.budget.toFixed(0);
+  // Ring
+  const circumference=175.9;
+  const offset=circumference-(circumference*(pct/100));
+  document.getElementById('budgetRing').style.strokeDashoffset=offset;
+  document.getElementById('budgetRing').style.stroke=pct>50?'var(--sage)':pct>25?'var(--amber)':'var(--rose)';
+  document.getElementById('ringVal').textContent=S.budget.toFixed(0);
+  document.getElementById('budgetSpent').textContent='€'+S.budgetSpent.toFixed(2)+' uitgegeven';
+  const now=new Date(); const daysToMonday=(8-now.getDay())%7||7;
+  document.getElementById('budgetDays').textContent=daysToMonday+' dag(en) tot maandag';
 }
-function saveMetrics() {
-  localStorage.setItem('w', S.weight); localStorage.setItem('s', S.steps); localStorage.setItem('b', S.budget);
-  const wH = JSON.parse(localStorage.getItem('wHistory') || '[]');
-  wH.push({date: new Date().toISOString().split('T')[0], w: S.weight});
-  if (wH.length > 90) wH.shift();
-  localStorage.setItem('wHistory', JSON.stringify(wH));
-  updateWeekStats(); showToast('✓ Metrics opgeslagen');
+
+async function spendB() {
+  const a=parseFloat(document.getElementById('bInput').value)||0;
+  if (a <= 0) { showToast('Voer een bedrag in'); return; }
+  const cat=document.getElementById('bCat').value;
+  const omschrijving=document.getElementById('bOmschrijving').value||cat;
+  S.budget=Math.max(0,S.budget-a);
+  S.budgetSpent+=a;
+  localStorage.setItem('b',S.budget);
+  localStorage.setItem('bSpent',S.budgetSpent);
+  // Sla op lokaal
+  const today=new Date().toLocaleDateString('nl-NL',{day:'numeric',month:'long'});
+  S.expenses.unshift({omschrijving,bedrag:a,cat,date:today,type:'Uitgave'});
+  if(S.expenses.length>50) S.expenses=S.expenses.slice(0,50);
+  localStorage.setItem('expenses',JSON.stringify(S.expenses));
+  // Sync Notion
+  apiCall('POST', '/financien', {omschrijving, bedrag:a, categorie:cat, type:'Uitgave'});
+  document.getElementById('bInput').value='';
+  document.getElementById('bOmschrijving').value='';
+  updateBudgetDisplay();
+  loadExpenses();
+  showToast('✓ €'+a.toFixed(2)+' geregistreerd');
 }
-function updateWeekStats() {
-  const wH = JSON.parse(localStorage.getItem('wHistory') || '[]');
-  if (wH.length >= 2) {
-    const diff = (wH[wH.length-1].w - wH[0].w).toFixed(1);
-    const el = document.getElementById('weekWeightChange');
-    el.textContent = (diff > 0 ? '+' : '') + diff + ' kg';
-    el.style.color = diff < 0 ? 'var(--sage)' : 'var(--rose)';
+
+function loadExpenses() {
+  const el=document.getElementById('finLog');
+  if (!S.expenses.length) {
+    el.innerHTML='<div style="font-size:10px;color:var(--dim);text-align:center;padding:16px 0;">Nog geen uitgaven.</div>';
+    return;
   }
-  let totalFL = 0;
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(); d.setDate(d.getDate() - i);
-    const h = parseFloat(localStorage.getItem('freelanceHours_' + d.toISOString().split('T')[0]) || '0');
-    totalFL += h;
-  }
-  document.getElementById('totalFreelanceHours').textContent = totalFL.toFixed(1) + ' u';
-  let totalSleep = 0, sleepDays = 0;
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(); d.setDate(d.getDate() - i);
-    const h = parseFloat(localStorage.getItem('sleepHours_' + d.toISOString().split('T')[0]) || '0');
-    if (h > 0) { totalSleep += h; sleepDays++; }
-  }
-  document.getElementById('avgSleep').textContent = sleepDays > 0 ? (totalSleep/sleepDays).toFixed(1) + ' u' : '—';
+  el.innerHTML=S.expenses.slice(0,8).map(e=>
+    `<div class="fin-row">
+      <div><div style="font-size:11px">${e.omschrijving}</div><div class="fin-cat">${e.cat} · ${e.date}</div></div>
+      <div class="fin-amount ${e.type==='Inkomsten'?'in':'out'}">€${parseFloat(e.bedrag).toFixed(2)}</div>
+    </div>`
+  ).join('');
 }
-function saveFreelanceHours() { const h = document.getElementById('freelanceHours').value; localStorage.setItem('freelanceHours_' + new Date().toISOString().split('T')[0], h); showToast('✓ Opgeslagen'); updateWeekStats(); }
-function saveSleepHours() { const h = document.getElementById('sleepHours').value; localStorage.setItem('sleepHours_' + new Date().toISOString().split('T')[0], h); showToast('✓ Opgeslagen'); updateWeekStats(); }
-function loadMetricsDisplay() {
-  updateW(S.weight); updateS(S.steps);
-  const pct = (S.budget/80)*100;
-  document.getElementById('mB').textContent = S.budget.toFixed(2);
-  document.getElementById('mBbar').style.width = pct + '%';
-  document.getElementById('mBpct').textContent = Math.round(pct) + '%';
-  document.getElementById('wInput').value = S.weight;
-  document.getElementById('sInput').value = S.steps;
+
+async function saveMetrics() {
+  localStorage.setItem('w',S.weight); localStorage.setItem('s',S.steps);
+  const wH=JSON.parse(localStorage.getItem('wHistory')||'[]');
+  wH.push({date:new Date().toISOString().split('T')[0],w:S.weight});
+  if(wH.length>90) wH.shift();
+  localStorage.setItem('wHistory',JSON.stringify(wH));
+  const today=new Date().toISOString().split('T')[0];
+  const fl=document.getElementById('freelanceHours').value;
+  const sl=document.getElementById('sleepHours').value;
+  const stemming=document.getElementById('stemmingSelect').value;
+  if(fl) localStorage.setItem('freelanceHours_'+today,fl);
+  if(sl) localStorage.setItem('sleepHours_'+today,sl);
+  // Sync Notion
+  const result=await apiCall('POST','/metrics',{
+    gewicht:S.weight, stappen:S.steps, energie:Math.round(S.cap/10),
+    slaap:sl||null, freelanceUren:fl||null,
+    stemming:stemming||null,
+  });
   updateWeekStats();
-  const today = new Date().toISOString().split('T')[0];
-  const fh = localStorage.getItem('freelanceHours_' + today);
-  const sh = localStorage.getItem('sleepHours_' + today);
-  if (fh) document.getElementById('freelanceHours').value = fh;
-  if (sh) document.getElementById('sleepHours').value = sh;
+  document.getElementById('profUren').textContent=(parseFloat(fl)||0).toFixed(1)+'u';
+  showToast(result?'✓ Opgeslagen in Notion':'✓ Lokaal opgeslagen');
 }
-function saveRef() {
-  const g = document.getElementById('rG').value.trim();
-  const b = document.getElementById('rB').value.trim();
-  const l = document.getElementById('rL').value.trim();
-  const gr = document.getElementById('rGr').value.trim();
-  const mood = document.getElementById('rMood').value;
-  if (!g && !b) { showToast('Vul minimaal één veld in'); return; }
-  const today = new Date().toLocaleDateString('nl-NL',{day:'numeric',month:'long'});
-  S.refs.unshift({g,b,l,gr,mood,date:today});
-  if (S.refs.length > 30) S.refs = S.refs.slice(0,30);
-  localStorage.setItem('refs', JSON.stringify(S.refs));
-  renderRefs(); clearRef(); showToast('✓ Reflectie opgeslagen');
+
+function updateWeekStats() {
+  const wH=JSON.parse(localStorage.getItem('wHistory')||'[]');
+  if(wH.length>=2){
+    const diff=(wH[wH.length-1].w-wH[0].w).toFixed(1);
+    const el=document.getElementById('weekWeightChange');
+    el.textContent=(diff>0?'+':'')+diff+' kg';
+    el.style.color=diff<0?'var(--sage)':'var(--rose)';
+  }
+  let totalFL=0;
+  for(let i=0;i<7;i++){
+    const d=new Date(); d.setDate(d.getDate()-i);
+    totalFL+=parseFloat(localStorage.getItem('freelanceHours_'+d.toISOString().split('T')[0])||'0');
+  }
+  document.getElementById('totalFreelanceHours').textContent=totalFL.toFixed(1)+'u';
+  let totalSl=0,slDays=0;
+  for(let i=0;i<7;i++){
+    const d=new Date(); d.setDate(d.getDate()-i);
+    const h=parseFloat(localStorage.getItem('sleepHours_'+d.toISOString().split('T')[0])||'0');
+    if(h>0){totalSl+=h;slDays++;}
+  }
+  document.getElementById('avgSleep').textContent=slDays>0?(totalSl/slDays).toFixed(1)+'u':'—';
 }
-function clearRef() { ['rG','rB','rL','rGr'].forEach(id => document.getElementById(id).value = ''); document.getElementById('rMood').value = ''; }
-function renderRefs() {
-  const el = document.getElementById('refLog');
-  if (!S.refs.length) { el.innerHTML = '<div style="font-size:11px;color:var(--dim);text-align:center;padding:24px 0">Begin vandaag met reflecteren.</div>'; return; }
-  el.innerHTML = S.refs.slice(0,7).map(r => `<div class="ref-entry"><div class="ref-date">${r.date}${r.mood?' · '+r.mood:''}</div>${r.g?`<div class="ref-line"><span style="color:var(--sage)">+ </span>${r.g}</div>`:''}${r.b?`<div class="ref-line"><span style="color:var(--rose)">− </span>${r.b}</div>`:''}${r.l?`<div class="ref-line"><span style="color:var(--ice)">→ </span>${r.l}</div>`:''}${r.gr?`<div style="margin-top:6px"><span class="tag tag-gold">🙏 ${r.gr}</span></div>`:''}</div>`).join('');
+
+function loadMetricsDisplay() {
+  updateW(S.weight); updateS(S.steps); updateBudgetDisplay();
+  document.getElementById('wInput').value=S.weight;
+  document.getElementById('sInput').value=S.steps;
+  updateWeekStats();
+  const today=new Date().toISOString().split('T')[0];
+  const fh=localStorage.getItem('freelanceHours_'+today);
+  const sh=localStorage.getItem('sleepHours_'+today);
+  if(fh) { document.getElementById('freelanceHours').value=fh; document.getElementById('profUren').textContent=fh+'u'; }
+  if(sh) document.getElementById('sleepHours').value=sh;
 }
-function loadRefs() { renderRefs(); }
-function updateNotionCard() {
-  const el = document.getElementById('notionStatus');
-  if (S.syncOk) {
-    el.innerHTML = `<div class="sr"><span class="sr-l">Status</span><span class="sr-r tag tag-sage">✓ Verbonden</span></div><div class="sr"><span class="sr-l">Workouts</span><span class="sr-r">${S.workouts.length} geladen</span></div><div class="sr"><span class="sr-l">Dag ID</span><span class="sr-r" style="font-size:9px;color:var(--dim)">${S.dagId?S.dagId.substring(0,8)+'...':'—'}</span></div>`;
-  } else {
-    el.innerHTML = `<div class="sr"><span class="sr-l">Status</span><span class="sr-r tag tag-rose">Offline</span></div><div class="sr"><span class="sr-l">Data</span><span class="sr-r" style="color:var(--amber)">Lokaal opgeslagen</span></div>`;
+
+// ─── KPI FREELANCE ───────────────────────────────────────
+function getWeekNumber(date) {
+  const d=new Date(Date.UTC(date.getFullYear(),date.getMonth(),date.getDate()));
+  const dayNum=d.getUTCDay()||7; d.setUTCDate(d.getUTCDate()+4-dayNum);
+  const yearStart=new Date(Date.UTC(d.getUTCFullYear(),0,1));
+  return Math.ceil((((d-yearStart)/86400000)+1)/7);
+}
+
+function loadKPIDisplay() {
+  const wn=getWeekNumber(new Date());
+  document.getElementById('kpiWeekLabel').textContent='Week '+wn;
+  const kpiKey='kpi_w'+wn+'_'+new Date().getFullYear();
+  const saved=JSON.parse(localStorage.getItem(kpiKey)||'{}');
+  if(saved.uren) document.getElementById('kpiUren').textContent=saved.uren;
+  if(saved.posts) document.getElementById('kpiPosts').textContent=saved.posts;
+  if(saved.gesprekken) document.getElementById('kpiGesprekken').textContent=saved.gesprekken;
+  if(saved.automations) document.getElementById('kpiAutomations').textContent=saved.automations;
+  if(saved.schema) {
+    const el=document.getElementById('kpiSchema');
+    el.textContent=saved.schema;
+    el.className='tag '+(saved.schema.includes('Voor')?'tag-sage':saved.schema.includes('Op')?'tag-gold':saved.schema.includes('Iets')?'tag-amber':'tag-rose');
   }
 }
-function goTo(id, el) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => { n.classList.remove('active'); const d = n.querySelector('.nav-dot'); if(d) d.remove(); });
-  document.getElementById('view-' + id).classList.add('active');
+
+async function saveKPI() {
+  const wn=getWeekNumber(new Date());
+  const kpiKey='kpi_w'+wn+'_'+new Date().getFullYear();
+  const weekLabel='Week '+wn+' - '+new Date().getFullYear();
+  const data={
+    uren:document.getElementById('kpiUrenInput').value||'0',
+    posts:document.getElementById('kpiPostsInput').value||'0',
+    gesprekken:document.getElementById('kpiGesprekkenInput').value||'0',
+    automations:document.getElementById('kpiAutomationsInput').value||'0',
+    schema:document.getElementById('kpiOpSchemaInput').value||'',
+  };
+  localStorage.setItem(kpiKey,JSON.stringify(data));
+  // Update display
+  document.getElementById('kpiUren').textContent=data.uren;
+  document.getElementById('kpiPosts').textContent=data.posts;
+  document.getElementById('kpiGesprekken').textContent=data.gesprekken;
+  document.getElementById('kpiAutomations').textContent=data.automations;
+  if(data.schema){
+    const el=document.getElementById('kpiSchema'); el.textContent=data.schema;
+    el.className='tag '+(data.schema.includes('Voor')?'tag-sage':data.schema.includes('Op')?'tag-gold':data.schema.includes('Iets')?'tag-amber':'tag-rose');
+  }
+  // Sync Notion
+  const result=await apiCall('POST','/kpi',{
+    week:weekLabel,
+    leeruren:data.uren, linkedinPosts:data.posts,
+    klantgesprekken:data.gesprekken, automations:data.automations,
+    opSchema:data.schema||null,
+  });
+  showToast(result&&!result.skipped?'✓ KPI opgeslagen in Notion':'✓ Lokaal opgeslagen');
+}
+
+// ─── REFLECTIE ───────────────────────────────────────────
+function saveRef() {
+  const g=document.getElementById('rG').value.trim();
+  const b=document.getElementById('rB').value.trim();
+  const l=document.getElementById('rL').value.trim();
+  const gr=document.getElementById('rGr').value.trim();
+  const mood=document.getElementById('rMood').value;
+  if(!g&&!b){showToast('Vul minimaal één veld in');return;}
+  const today=new Date().toLocaleDateString('nl-NL',{day:'numeric',month:'long'});
+  S.refs.unshift({g,b,l,gr,mood,date:today});
+  if(S.refs.length>30) S.refs=S.refs.slice(0,30);
+  localStorage.setItem('refs',JSON.stringify(S.refs));
+  renderRefs(); clearRef();
+  showToast('✓ Reflectie opgeslagen');
+}
+
+function clearRef(){['rG','rB','rL','rGr'].forEach(id=>document.getElementById(id).value='');document.getElementById('rMood').value='';}
+
+function renderRefs() {
+  const el=document.getElementById('refLog');
+  if(!S.refs.length){el.innerHTML='<div style="font-size:11px;color:var(--dim);text-align:center;padding:24px 0">Begin vandaag met reflecteren.</div>';return;}
+  el.innerHTML=S.refs.slice(0,7).map(r=>
+    `<div class="ref-entry"><div class="ref-date">${r.date}${r.mood?' · '+r.mood:''}</div>
+    ${r.g?`<div class="ref-line"><span style="color:var(--sage)">+ </span>${r.g}</div>`:''}
+    ${r.b?`<div class="ref-line"><span style="color:var(--rose)">− </span>${r.b}</div>`:''}
+    ${r.l?`<div class="ref-line"><span style="color:var(--ice)">→ </span>${r.l}</div>`:''}
+    ${r.gr?`<div style="margin-top:6px"><span class="tag tag-gold">🙏 ${r.gr}</span></div>`:''}</div>`
+  ).join('');
+}
+
+function loadRefs(){renderRefs();}
+
+// ─── PROFIEL ─────────────────────────────────────────────
+function updateProfileStats() {
+  document.getElementById('profGewicht').textContent=S.weight.toFixed(1);
+  document.getElementById('profBudget').textContent='€'+S.budget.toFixed(0);
+  const score=calcStreakScore();
+  document.getElementById('profStreak').textContent=score;
+  const today=new Date().toISOString().split('T')[0];
+  const fl=localStorage.getItem('freelanceHours_'+today)||'0';
+  let totalFL=0;
+  for(let i=0;i<7;i++){
+    const d=new Date(); d.setDate(d.getDate()-i);
+    totalFL+=parseFloat(localStorage.getItem('freelanceHours_'+d.toISOString().split('T')[0])||'0');
+  }
+  document.getElementById('profUren').textContent=totalFL.toFixed(1)+'u';
+}
+
+function calcDagenTotVrijheid() {
+  const vrijheid=new Date('2026-12-31');
+  const nu=new Date();
+  const dagen=Math.ceil((vrijheid-nu)/(1000*60*60*24));
+  document.getElementById('dagenTotVrijheid').textContent=dagen+' dagen';
+}
+
+function updateNotionCard() {
+  const el=document.getElementById('notionStatus');
+  if(S.syncOk){
+    el.innerHTML=`<div class="sr"><span class="sr-l">Notion</span><span class="sr-r tag tag-sage">✓ Verbonden</span></div>
+    <div class="sr"><span class="sr-l">Workouts</span><span class="sr-r">${S.workouts.length} geladen</span></div>
+    <div class="sr"><span class="sr-l">AI Coach</span><span class="sr-r tag tag-gold">Claude Haiku</span></div>
+    <div class="sr"><span class="sr-l">Databases</span><span class="sr-r tag tag-ice">Metrics · Finance · KPI</span></div>`;
+  } else {
+    el.innerHTML=`<div class="sr"><span class="sr-l">Notion</span><span class="sr-r tag tag-rose">Offline</span></div>
+    <div class="sr"><span class="sr-l">Data</span><span class="sr-r" style="color:var(--amber)">Lokaal opgeslagen</span></div>`;
+  }
+}
+
+// ─── CHECKS ──────────────────────────────────────────────
+function tc(el){el.classList.toggle('done');saveChecks();}
+function saveChecks(){
+  const checks=[];
+  document.querySelectorAll('.ck').forEach(ck=>checks.push(ck.classList.contains('done')));
+  localStorage.setItem('checks_'+new Date().toISOString().split('T')[0],JSON.stringify(checks));
+}
+function loadChecks(){
+  const saved=JSON.parse(localStorage.getItem('checks_'+new Date().toISOString().split('T')[0])||'[]');
+  document.querySelectorAll('.ck').forEach((ck,i)=>{if(saved[i])ck.classList.add('done');});
+}
+
+// ─── UTILS ───────────────────────────────────────────────
+function goTo(id,el){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>{n.classList.remove('active');const d=n.querySelector('.nav-dot');if(d)d.remove();});
+  document.getElementById('view-'+id).classList.add('active');
   el.classList.add('active');
-  const dot = document.createElement('div'); dot.className = 'nav-dot'; el.appendChild(dot);
-  document.getElementById('mainContent').scrollTo(0, 0);
+  const dot=document.createElement('div');dot.className='nav-dot';el.appendChild(dot);
+  document.getElementById('mainContent').scrollTo(0,0);
+  if(id==='profiel') updateProfileStats();
+  if(id==='freelance') loadKPIDisplay();
 }
-function updateClock() {
-  const n = new Date();
-  document.getElementById('clockEl').textContent = String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0');
+
+function updateClock(){
+  const n=new Date();
+  document.getElementById('clockEl').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
 }
-function setHeroDate() {
-  const n = new Date();
-  const days = ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'];
-  const months = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
-  document.getElementById('heroDate').textContent = (days[n.getDay()] + ' ' + n.getDate() + ' ' + months[n.getMonth()] + ' ' + n.getFullYear()).toUpperCase();
+
+function setHeroDate(){
+  const n=new Date();
+  const days=['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'];
+  const months=['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+  document.getElementById('heroDate').textContent=(days[n.getDay()]+' '+n.getDate()+' '+months[n.getMonth()]+' '+n.getFullYear()).toUpperCase();
+  document.getElementById('refDate').textContent=n.getDate()+' '+months[n.getMonth()];
 }
-function setSyncStatus(state, text) {
-  const el = document.getElementById('syncStatus');
-  el.textContent = text;
-  el.style.color = state==='ok'?'var(--sage)':state==='loading'?'var(--amber)':'var(--rose)';
+
+function setSyncStatus(state,text){
+  const el=document.getElementById('syncStatus');
+  el.textContent=text;
+  el.style.color=state==='ok'?'var(--sage)':state==='loading'?'var(--amber)':'var(--rose)';
 }
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2200);
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
 }
-document.addEventListener('DOMContentLoaded', init);
+
+document.addEventListener('DOMContentLoaded',init);
 </script>
 </body>
 </html>
